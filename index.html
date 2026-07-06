@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f766e">
+<title>Mi Ahorro · Toyota Fortuner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+  :root{
+    --bg:#0b1120;
+    --card:#131c31;
+    --card2:#1b2743;
+    --line:#26324f;
+    --text:#e8edf7;
+    --muted:#93a1c0;
+    --accent:#22c55e;
+    --accent2:#0ea5e9;
+    --danger:#ef4444;
+    --warn:#f59e0b;
+    --radius:18px;
+    --shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%,#16233f 0%,var(--bg) 55%);
+    color:var(--text);
+    min-height:100dvh;
+    padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 90px);
+    max-width:520px;margin:0 auto;
+    -webkit-font-smoothing:antialiased;
+  }
+  header{padding:22px 4px 8px;text-align:center}
+  header .eyebrow{color:var(--muted);font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:600}
+  header h1{margin:4px 0 0;font-size:22px;font-weight:800;display:flex;gap:8px;align-items:center;justify-content:center}
+  .goal-edit{background:none;border:none;color:var(--muted);font-size:15px;cursor:pointer;padding:6px}
+  .goal-img{display:block;width:100%;border-radius:16px;margin:14px 0 0;border:1px solid var(--line);
+    box-shadow:0 8px 24px rgba(0,0,0,.35);background:#fff}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:14px 0}
+
+  /* Progreso */
+  .hero{text-align:center;background:linear-gradient(160deg,#132a2a,#131c31 60%);border-color:#1f4d3f}
+  .hero .saved{font-size:34px;font-weight:800;letter-spacing:-.5px}
+  .hero .saved small{font-size:16px;color:var(--muted);font-weight:600}
+  .hero .of{color:var(--muted);font-size:14px;margin-top:2px}
+  .bar{height:16px;background:#0c1424;border-radius:999px;overflow:hidden;margin:16px 0 8px;border:1px solid var(--line)}
+  .bar > i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .6s cubic-bezier(.2,.7,.2,1)}
+  .pct-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:600}
+  .pct-big{font-size:20px;font-weight:800;color:var(--accent)}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .stat .lbl{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+  .stat .val{font-size:18px;font-weight:800;margin-top:4px}
+
+  .motiv{background:linear-gradient(135deg,#1a2b1a,#132116);border-color:#2a4a2f;text-align:center;font-weight:600;font-size:15px;line-height:1.5}
+  .motiv .emoji{font-size:26px;display:block;margin-bottom:6px}
+
+  .eta{display:flex;justify-content:space-around;text-align:center;gap:8px}
+  .eta div b{display:block;font-size:26px;font-weight:800}
+  .eta div span{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+  .eta-note{color:var(--muted);font-size:12px;text-align:center;margin-top:10px}
+
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:24px 4px 8px}
+
+  /* Historial */
+  .mv{display:flex;align-items:center;gap:12px;padding:13px;border:1px solid var(--line);border-radius:14px;background:var(--card2);margin-bottom:10px}
+  .mv .ic{width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;font-size:18px;font-weight:800}
+  .mv.dep .ic{background:rgba(34,197,94,.15);color:var(--accent)}
+  .mv.ret .ic{background:rgba(239,68,68,.15);color:var(--danger)}
+  .mv .info{flex:1;min-width:0}
+  .mv .amt{font-weight:800;font-size:16px}
+  .mv.dep .amt{color:var(--accent)}
+  .mv.ret .amt{color:var(--danger)}
+  .mv .meta{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mv .acts{display:flex;gap:4px}
+  .mv .acts button{background:none;border:none;color:var(--muted);font-size:17px;padding:8px;cursor:pointer;border-radius:8px}
+  .mv .acts button:active{background:var(--line)}
+  .empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:14px}
+
+  /* FAB */
+  .fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 20px);
+    background:linear-gradient(90deg,var(--accent2),var(--accent));color:#04180c;border:none;
+    font-weight:800;font-size:16px;padding:15px 26px;border-radius:999px;box-shadow:0 12px 28px rgba(34,197,94,.35);
+    cursor:pointer;z-index:50;display:flex;gap:8px;align-items:center}
+  .fab:active{transform:translateX(-50%) scale(.97)}
+
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:rgba(3,7,18,.7);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:100}
+  .overlay.open{display:flex}
+  .sheet{background:var(--card);width:100%;max-width:520px;border-radius:22px 22px 0 0;border:1px solid var(--line);border-bottom:none;padding:20px 18px calc(env(safe-area-inset-bottom) + 22px);animation:up .28s cubic-bezier(.2,.8,.2,1)}
+  @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .sheet h3{margin:0 0 16px;font-size:19px;font-weight:800;text-align:center}
+  .seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px}
+  .seg button{flex:1;border:none;background:none;color:var(--muted);font-weight:700;padding:11px;border-radius:9px;cursor:pointer;font-size:15px}
+  .seg button.on-dep{background:rgba(34,197,94,.2);color:var(--accent)}
+  .seg button.on-ret{background:rgba(239,68,68,.2);color:var(--danger)}
+  label{display:block;color:var(--muted);font-size:13px;font-weight:600;margin:0 2px 6px}
+  input,textarea{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--text);
+    font-size:16px;padding:13px 14px;font-family:inherit;margin-bottom:14px}
+  input:focus,textarea:focus{outline:none;border-color:var(--accent2)}
+  .amount-input{font-size:24px;font-weight:800;text-align:center}
+  textarea{resize:none;min-height:52px}
+  .row-btns{display:flex;gap:10px;margin-top:4px}
+  .btn{flex:1;border:none;border-radius:12px;padding:15px;font-weight:800;font-size:16px;cursor:pointer}
+  .btn.primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#04180c}
+  .btn.ghost{background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+  .btn:active{transform:scale(.98)}
+  .hint{color:var(--muted);font-size:12px;text-align:center;margin-top:-6px}
+
+  /* Card header con acción */
+  .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .ch h2{margin:0}
+  .ch .link{background:none;border:none;color:var(--accent2);font-weight:700;font-size:13px;cursor:pointer;padding:4px}
+
+  /* Meta mensual */
+  .month-goal{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .month-goal .big{font-size:22px;font-weight:800}
+  .month-goal .sub{color:var(--muted);font-size:13px}
+  .minibar{height:12px;background:#0c1424;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .minibar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .5s}
+  .chips{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .chip{flex:1;min-width:90px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;cursor:pointer}
+  .chip:active{border-color:var(--accent)}
+  .chip .plazo{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .chip .m{font-weight:800;font-size:14px;margin-top:3px}
+
+  /* Banco */
+  .bank .row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+  .bank .row:last-child{border-bottom:none}
+  .bank .k{color:var(--muted);font-size:13px}
+  .bank .v{font-weight:700;font-size:15px;text-align:right;word-break:break-all}
+  .bank .copy{background:none;border:none;color:var(--accent2);cursor:pointer;font-size:15px;padding:2px 6px}
+  .bank .none{color:var(--muted);font-size:14px;text-align:center;padding:6px 0}
+
+  /* Respaldo */
+  .backup{display:flex;gap:10px}
+  .backup button{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:12px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .backup button:active{border-color:var(--accent2)}
+  .backup button span{font-size:20px}
+
+  footer{text-align:center;color:var(--muted);font-size:11.5px;padding:8px 0 4px;opacity:.7}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Mi meta de ahorro</div>
+  <h1>🚙 Toyota Fortuner</h1>
+  <button class="goal-edit" id="editGoal">Objetivo: <span id="goalTxt">₲ 230.000.000</span> ✏️</button>
+  <img class="goal-img" src="fortuner.jpg" alt="Toyota Fortuner" loading="lazy">
+</header>
+
+<section class="card hero">
+  <div class="saved" id="saved">₲ 0</div>
+  <div class="of">de <span id="goalOf">₲ 230.000.000</span></div>
+  <div class="bar"><i id="barFill"></i></div>
+  <div class="pct-row">
+    <span class="pct-big" id="pctBig">0%</span>
+    <span>Falta <span id="restante">₲ 230.000.000</span></span>
+  </div>
+</section>
+
+<section class="card motiv" id="motiv">
+  <span class="emoji">🌱</span>
+  <span id="motivTxt">¡Cada guaraní cuenta! Registrá tu primer depósito para arrancar.</span>
+</section>
+
+<section class="card">
+  <div class="stats">
+    <div class="stat"><div class="lbl">Ahorrado</div><div class="val" id="stSaved">₲ 0</div></div>
+    <div class="stat"><div class="lbl">Restante</div><div class="val" id="stRest">₲ 230.000.000</div></div>
+    <div class="stat"><div class="lbl">Ritmo diario</div><div class="val" id="stRate">—</div></div>
+    <div class="stat"><div class="lbl">Movimientos</div><div class="val" id="stCount">0</div></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2 style="margin-top:0">⏳ Tiempo estimado</h2>
+  <div class="eta">
+    <div><b id="etaY">—</b><span>años</span></div>
+    <div><b id="etaM">—</b><span>meses</span></div>
+    <div><b id="etaD">—</b><span>días</span></div>
+  </div>
+  <div class="eta-note" id="etaNote">Basado en tu ritmo real de ahorro.</div>
+</section>
+
+<section class="card">
+  <div class="ch">
+    <h2>🎯 Meta mensual</h2>
+    <button class="link" id="editMonthly">Definir ✏️</button>
+  </div>
+  <div class="month-goal">
+    <div class="big" id="mgSaved">₲ 0</div>
+    <div class="sub">de <span id="mgGoal">—</span> este mes</div>
+  </div>
+  <div class="minibar"><i id="mgBar"></i></div>
+  <div class="eta-note" id="mgNote" style="text-align:left">Aún no definiste una meta mensual.</div>
+  <div class="chips" id="chips"></div>
+</section>
+
+<section class="card bank">
+  <div class="ch">
+    <h2>🏦 Dónde está el dinero</h2>
+    <button class="link" id="editBank">Editar ✏️</button>
+  </div>
+  <div id="bankBody"></div>
+</section>
+
+<section class="card">
+  <div class="ch"><h2>💾 Respaldo</h2></div>
+  <div class="backup">
+    <button id="btnExport"><span>⬆️</span>Exportar</button>
+    <button id="btnImport"><span>⬇️</span>Importar</button>
+  </div>
+  <div class="eta-note" style="margin-top:10px">Guardá una copia de tus datos o restaurala en otro dispositivo.</div>
+  <input type="file" id="fileImport" accept="application/json,.json" style="display:none">
+</section>
+
+<h2>📜 Historial</h2>
+<div id="list"></div>
+
+<footer>Datos guardados en este dispositivo · Funciona sin conexión</footer>
+
+<button class="fab" id="fab">＋ Registrar movimiento</button>
+
+<!-- Modal movimiento -->
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet">
+    <h3 id="sheetTitle">Nuevo movimiento</h3>
+    <div class="seg">
+      <button type="button" id="tDep" class="on-dep">↑ Depósito</button>
+      <button type="button" id="tRet">↓ Retiro</button>
+    </div>
+    <label>Monto (₲)</label>
+    <input class="amount-input" id="inAmt" inputmode="numeric" placeholder="0" autocomplete="off">
+    <label>Fecha</label>
+    <input type="date" id="inDate">
+    <label>Nota (opcional)</label>
+    <textarea id="inNote" placeholder="Ej: aguinaldo, venta, sueldo…"></textarea>
+    <div class="row-btns">
+      <button class="btn ghost" id="cancel">Cancelar</button>
+      <button class="btn primary" id="save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DEFAULT_GOAL = 230000000;
+const K_MOVES = "ahorro_moves_v1";
+const K_GOAL  = "ahorro_goal_v1";
+const K_CFG   = "ahorro_cfg_v1";
+
+const $ = id => document.getElementById(id);
+const fmt = n => "₲ " + Math.round(Math.abs(n)).toLocaleString("es-PY").replace(/,/g,".");
+
+let moves = load(K_MOVES, []);
+let goal  = load(K_GOAL, DEFAULT_GOAL);
+let cfg   = load(K_CFG, { bank:"", account:"", holder:"", monthly:0 });
+let editingId = null;   // id del movimiento en edición
+let curType = "dep";
+
+function load(k, def){ try{ const v = JSON.parse(localStorage.getItem(k)); return v ?? def; }catch(e){ return def; } }
+function save(){
+  localStorage.setItem(K_MOVES, JSON.stringify(moves));
+  localStorage.setItem(K_GOAL, JSON.stringify(goal));
+  localStorage.setItem(K_CFG, JSON.stringify(cfg));
+}
+
+/* ---------- Cálculos ---------- */
+function totalSaved(){
+  return moves.reduce((s,m)=> s + (m.type==="dep" ? m.amount : -m.amount), 0);
+}
+
+function estimate(saved){
+  // Ritmo real: total ahorrado ÷ días transcurridos desde el primer movimiento
+  if(moves.length === 0 || saved <= 0) return null;
+  const dates = moves.map(m=> new Date(m.date + "T00:00:00").getTime());
+  const first = Math.min(...dates);
+  const now = new Date(); now.setHours(0,0,0,0);
+  let days = Math.floor((now.getTime() - first) / 86400000);
+  if(days < 1) days = 1;                 // evita división por cero el primer día
+  const rate = saved / days;             // guaraníes por día
+  if(rate <= 0) return null;
+  const remaining = Math.max(0, goal - saved);
+  const daysLeft = Math.ceil(remaining / rate);
+  const y = Math.floor(daysLeft / 365);
+  const m = Math.floor((daysLeft % 365) / 30);
+  const d = Math.floor((daysLeft % 365) % 30);
+  return { rate, daysLeft, y, m, d };
+}
+
+const MOTIV = [
+  {max:0,   e:"🌱", t:"¡Cada guaraní cuenta! Registrá tu primer depósito para arrancar."},
+  {max:25,  e:"🚀", t:"¡Gran comienzo! Ya diste el primer paso hacia tu Fortuner."},
+  {max:50,  e:"💪", t:"¡Vas muy bien! Estás construyendo el hábito. Seguí firme."},
+  {max:75,  e:"🔥", t:"¡Ya pasaste la mitad! El volante está cada vez más cerca."},
+  {max:99,  e:"🏁", t:"¡Recta final! Falta muy poco para lograrlo, no aflojes."},
+  {max:100, e:"🎉", t:"¡META CUMPLIDA! Es hora de manejar tu Toyota Fortuner. ¡Felicitaciones!"},
+];
+function motivFor(pct){
+  if(pct <= 0) return MOTIV[0];
+  if(pct >= 100) return MOTIV[5];
+  if(pct < 25) return MOTIV[1];
+  if(pct < 50) return MOTIV[2];
+  if(pct < 75) return MOTIV[3];
+  return MOTIV[4];
+}
+
+/* ---------- Render ---------- */
+function render(){
+  const saved = totalSaved();
+  const rest = Math.max(0, goal - saved);
+  const pct = goal > 0 ? Math.min(100, (saved / goal) * 100) : 0;
+
+  $("saved").textContent = fmt(saved);
+  $("goalOf").textContent = fmt(goal);
+  $("goalTxt").textContent = fmt(goal);
+  $("restante").textContent = fmt(rest);
+  $("pctBig").textContent = pct.toFixed(pct>=100?0:1) + "%";
+  $("barFill").style.width = pct + "%";
+
+  $("stSaved").textContent = fmt(saved);
+  $("stRest").textContent = fmt(rest);
+  $("stCount").textContent = moves.length;
+
+  const est = estimate(saved);
+  if(est){
+    $("stRate").textContent = fmt(est.rate) + "/d";
+  } else {
+    $("stRate").textContent = "—";
+  }
+
+  // motivador
+  const mo = motivFor(pct);
+  $("motiv").querySelector(".emoji").textContent = mo.e;
+  $("motivTxt").textContent = mo.t;
+
+  // ETA
+  if(saved >= goal){
+    $("etaY").textContent = "🎉"; $("etaM").textContent=""; $("etaD").textContent="";
+    $("etaNote").textContent = "¡Objetivo alcanzado!";
+  } else if(est){
+    $("etaY").textContent = est.y;
+    $("etaM").textContent = est.m;
+    $("etaD").textContent = est.d;
+    const fecha = new Date(); fecha.setDate(fecha.getDate() + est.daysLeft);
+    $("etaNote").textContent = "A este ritmo, meta cerca del " + fecha.toLocaleDateString("es-PY",{day:"numeric",month:"long",year:"numeric"}) + ".";
+  } else {
+    $("etaY").textContent="—"; $("etaM").textContent="—"; $("etaD").textContent="—";
+    $("etaNote").textContent = "Registrá depósitos para estimar el tiempo.";
+  }
+
+  renderMonthly(saved, rest);
+  renderBank();
+  renderList();
+  save();
+  updateWidget(saved, rest, pct);
+}
+
+function updateWidget(saved, rest, pct){
+  try{
+    if(navigator.serviceWorker && navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage({
+        type:"widget-update",
+        data:{ saved:fmt(saved), goal:fmt(goal), rest:fmt(rest), pct: pct.toFixed(0) }
+      });
+    }
+  }catch(e){}
+}
+
+/* Depósitos netos del mes calendario actual */
+function savedThisMonth(){
+  const now = new Date();
+  const y = now.getFullYear(), mo = now.getMonth();
+  return moves.reduce((s,m)=>{
+    const d = new Date(m.date+"T00:00:00");
+    if(d.getFullYear()===y && d.getMonth()===mo) return s + (m.type==="dep"? m.amount : -m.amount);
+    return s;
+  }, 0);
+}
+
+function renderMonthly(saved, rest){
+  const mSaved = savedThisMonth();
+  $("mgSaved").textContent = fmt(mSaved);
+
+  if(cfg.monthly > 0){
+    $("mgGoal").textContent = fmt(cfg.monthly);
+    const p = Math.min(100, (mSaved / cfg.monthly) * 100);
+    $("mgBar").style.width = p + "%";
+    if(mSaved >= cfg.monthly){
+      $("mgNote").textContent = "¡Meta del mes cumplida! 🎉 Vas " + fmt(mSaved - cfg.monthly) + " por encima.";
+    } else {
+      $("mgNote").textContent = "Te faltan " + fmt(cfg.monthly - mSaved) + " para tu meta de este mes.";
+    }
+  } else {
+    $("mgGoal").textContent = "—";
+    $("mgBar").style.width = "0%";
+    $("mgNote").textContent = "Elegí un plazo abajo o tocá “Definir” para fijar tu meta mensual.";
+  }
+
+  // Sugerencias: cuánto ahorrar por mes para llegar en 12 / 24 / 36 meses
+  const plazos = [12, 24, 36];
+  $("chips").innerHTML = rest <= 0 ? "" : plazos.map(n=>{
+    const cuota = Math.ceil(rest / n / 1000) * 1000; // redondeo a mil
+    return `<div class="chip" onclick="setMonthly(${cuota})">
+      <div class="plazo">en ${n} meses</div>
+      <div class="m">${fmt(cuota)}/mes</div>
+    </div>`;
+  }).join("");
+}
+
+window.setMonthly = function(v){ cfg.monthly = v; render(); };
+
+function renderBank(){
+  const el = $("bankBody");
+  if(!cfg.bank && !cfg.account && !cfg.holder){
+    el.innerHTML = '<div class="none">Todavía no registraste dónde guardás el dinero.<br>Tocá “Editar” para agregar tu banco y cuenta.</div>';
+    return;
+  }
+  let rows = "";
+  if(cfg.bank) rows += `<div class="row"><div class="k">Banco</div><div class="v">${escapeHtml(cfg.bank)}</div></div>`;
+  if(cfg.holder) rows += `<div class="row"><div class="k">Titular</div><div class="v">${escapeHtml(cfg.holder)}</div></div>`;
+  if(cfg.account) rows += `<div class="row"><div class="k">N° de cuenta</div><div class="v">${escapeHtml(cfg.account)} <button class="copy" onclick="copyAcct()" aria-label="Copiar">📋</button></div></div>`;
+  el.innerHTML = rows;
+}
+
+window.copyAcct = function(){
+  if(navigator.clipboard) navigator.clipboard.writeText(cfg.account).then(()=>toast("Cuenta copiada")).catch(()=>{});
+};
+
+function renderList(){
+  const el = $("list");
+  if(moves.length === 0){
+    el.innerHTML = '<div class="empty">Todavía no hay movimientos.<br>Tocá “Registrar movimiento” para empezar. 💸</div>';
+    return;
+  }
+  const sorted = [...moves].sort((a,b)=> (b.date.localeCompare(a.date)) || (b.id - a.id));
+  el.innerHTML = sorted.map(m=>{
+    const dep = m.type==="dep";
+    const fecha = new Date(m.date+"T00:00:00").toLocaleDateString("es-PY",{day:"2-digit",month:"short",year:"numeric"});
+    const nota = m.note ? " · " + escapeHtml(m.note) : "";
+    return `<div class="mv ${dep?'dep':'ret'}">
+      <div class="ic">${dep?'↑':'↓'}</div>
+      <div class="info">
+        <div class="amt">${dep?'+':'−'} ${fmt(m.amount)}</div>
+        <div class="meta">${fecha}${nota}</div>
+      </div>
+      <div class="acts">
+        <button onclick="editMove(${m.id})" aria-label="Editar">✏️</button>
+        <button onclick="delMove(${m.id})" aria-label="Borrar">🗑️</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+function escapeHtml(s){ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ---------- Modal ---------- */
+function openSheet(){ $("overlay").classList.add("open"); }
+function closeSheet(){ $("overlay").classList.remove("open"); editingId = null; }
+
+function setType(t){
+  curType = t;
+  $("tDep").className = t==="dep" ? "on-dep" : "";
+  $("tRet").className = t==="ret" ? "on-ret" : "";
+}
+
+function newMove(){
+  editingId = null;
+  $("sheetTitle").textContent = "Nuevo movimiento";
+  setType("dep");
+  $("inAmt").value = "";
+  $("inDate").value = todayStr();
+  $("inNote").value = "";
+  openSheet();
+  setTimeout(()=>$("inAmt").focus(), 250);
+}
+
+window.editMove = function(id){
+  const m = moves.find(x=>x.id===id); if(!m) return;
+  editingId = id;
+  $("sheetTitle").textContent = "Editar movimiento";
+  setType(m.type);
+  $("inAmt").value = m.amount.toLocaleString("es-PY").replace(/,/g,".");
+  $("inDate").value = m.date;
+  $("inNote").value = m.note || "";
+  openSheet();
+};
+
+window.delMove = function(id){
+  if(!confirm("¿Borrar este movimiento?")) return;
+  moves = moves.filter(x=>x.id!==id);
+  render();
+};
+
+function parseAmt(v){ return parseInt((v||"").replace(/\D/g,""),10) || 0; }
+function todayStr(){ const d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+function saveMove(){
+  const amount = parseAmt($("inAmt").value);
+  const date = $("inDate").value || todayStr();
+  const note = $("inNote").value.trim();
+  if(amount <= 0){ $("inAmt").focus(); return; }
+  if(editingId){
+    const m = moves.find(x=>x.id===editingId);
+    if(m){ m.type=curType; m.amount=amount; m.date=date; m.note=note; }
+  } else {
+    moves.push({ id: Date.now() + Math.floor(Math.random()*1000), type:curType, amount, date, note });
+  }
+  closeSheet();
+  render();
+}
+
+function editGoal(){
+  const cur = goal.toLocaleString("es-PY").replace(/,/g,".");
+  const v = prompt("Nuevo objetivo en guaraníes:", cur);
+  if(v === null) return;
+  const n = parseAmt(v);
+  if(n > 0){ goal = n; render(); }
+}
+
+function editMonthly(){
+  const cur = cfg.monthly ? cfg.monthly.toLocaleString("es-PY").replace(/,/g,".") : "";
+  const v = prompt("¿Cuánto querés ahorrar por mes? (₲)\nDejalo vacío para quitar la meta mensual.", cur);
+  if(v === null) return;
+  cfg.monthly = parseAmt(v);
+  render();
+}
+
+function editBank(){
+  const bank = prompt("Nombre del banco / billetera:", cfg.bank || "");
+  if(bank === null) return;
+  const holder = prompt("Titular de la cuenta (opcional):", cfg.holder || "");
+  if(holder === null) return;
+  const account = prompt("Número de cuenta:", cfg.account || "");
+  if(account === null) return;
+  cfg.bank = bank.trim(); cfg.holder = holder.trim(); cfg.account = account.trim();
+  render();
+}
+
+/* ---------- Respaldo ---------- */
+function exportData(){
+  const data = { app:"mi-ahorro", version:1, exportedAt:new Date().toISOString(), goal, cfg, moves };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const stamp = todayStr();
+  a.href = url; a.download = "respaldo-ahorro-" + stamp + ".json";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  toast("Respaldo exportado");
+}
+
+function importData(file){
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data.moves)) throw new Error("formato");
+      if(!confirm("Esto reemplazará tus datos actuales por los del respaldo. ¿Continuar?")) return;
+      moves = data.moves;
+      if(typeof data.goal === "number" && data.goal > 0) goal = data.goal;
+      if(data.cfg && typeof data.cfg === "object") cfg = Object.assign({ bank:"", account:"", holder:"", monthly:0 }, data.cfg);
+      render();
+      toast("Datos importados");
+    }catch(e){ alert("El archivo no es un respaldo válido."); }
+  };
+  reader.readAsText(file);
+}
+
+/* ---------- Toast ---------- */
+let toastT;
+function toast(msg){
+  let t = $("toast");
+  if(!t){ t = document.createElement("div"); t.id = "toast"; document.body.appendChild(t);
+    t.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0f2f22;border:1px solid var(--accent);color:var(--text);padding:11px 18px;border-radius:999px;font-weight:700;font-size:14px;z-index:200;box-shadow:var(--shadow);transition:opacity .3s;opacity:0";
+  }
+  t.textContent = msg; t.style.opacity = "1";
+  clearTimeout(toastT); toastT = setTimeout(()=>{ t.style.opacity = "0"; }, 1800);
+}
+
+/* Formateo en vivo del monto */
+$("inAmt").addEventListener("input", e=>{
+  const n = parseAmt(e.target.value);
+  e.target.value = n ? n.toLocaleString("es-PY").replace(/,/g,".") : "";
+});
+
+/* Eventos */
+$("fab").addEventListener("click", newMove);
+$("cancel").addEventListener("click", closeSheet);
+$("save").addEventListener("click", saveMove);
+$("tDep").addEventListener("click", ()=>setType("dep"));
+$("tRet").addEventListener("click", ()=>setType("ret"));
+$("editGoal").addEventListener("click", editGoal);
+$("editMonthly").addEventListener("click", editMonthly);
+$("editBank").addEventListener("click", editBank);
+$("btnExport").addEventListener("click", exportData);
+$("btnImport").addEventListener("click", ()=>$("fileImport").click());
+$("fileImport").addEventListener("change", e=>{ if(e.target.files[0]) importData(e.target.files[0]); e.target.value=""; });
+$("overlay").addEventListener("click", e=>{ if(e.target===$("overlay")) closeSheet(); });
+
+render();
+
+/* Acceso directo del ícono (long-press) → abre depósito */
+if(new URLSearchParams(location.search).get("action") === "deposit"){
+  newMove();
+}
+
+/* Service worker */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", ()=> navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>

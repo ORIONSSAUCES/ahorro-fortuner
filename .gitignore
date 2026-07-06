@@ -1,0 +1,7 @@
+# Respaldos exportados
+respaldo-ahorro-*.json
+
+# Archivos del sistema
+Thumbs.db
+Desktop.ini
+.DS_Store
