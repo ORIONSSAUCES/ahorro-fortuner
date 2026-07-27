@@ -1,14 +1,35 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0f766e">
+<meta name="theme-color" content="#14532d">
 <title>Mi Ahorro · Toyota Fortuner</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
   :root{
+    /* Claro (por defecto) — verde lima moderno */
+    --bg:#eef1ec;
+    --card:#ffffff;
+    --card2:#f2f6f0;
+    --line:#e5eae1;
+    --text:#132018;
+    --muted:#66766b;
+    --accent:#16a34a;
+    --accent2:#0ea5e9;
+    --lime:#bef264;
+    --lime-ink:#1a2e05;
+    --danger:#e5484d;
+    --warn:#d97706;
+    --hero1:#14532d;
+    --hero2:#1c6b3f;
+    --hero-ink:#ecfbe4;
+    --hero-muted:#a7d9b6;
+    --radius:20px;
+    --shadow:0 8px 24px rgba(20,45,28,.08);
+  }
+  html[data-theme="dark"]{
     --bg:#0b1120;
     --card:#131c31;
     --card2:#1b2743;
@@ -17,16 +38,21 @@
     --muted:#93a1c0;
     --accent:#22c55e;
     --accent2:#0ea5e9;
+    --lime:#a3e635;
+    --lime-ink:#152a05;
     --danger:#ef4444;
     --warn:#f59e0b;
-    --radius:18px;
-    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --hero1:#0f3d28;
+    --hero2:#123a30;
+    --hero-ink:#dff5e6;
+    --hero-muted:#7fb894;
+    --shadow:0 10px 30px rgba(0,0,0,.4);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0;padding:0}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:radial-gradient(1200px 600px at 50% -10%,#16233f 0%,var(--bg) 55%);
+    background:var(--bg);
     color:var(--text);
     min-height:100dvh;
     padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 150px);
@@ -42,11 +68,13 @@
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:14px 0}
 
   /* Progreso */
-  .hero{text-align:center;background:linear-gradient(160deg,#132a2a,#131c31 60%);border-color:#1f4d3f}
+  .hero{text-align:center;background:linear-gradient(155deg,var(--hero1),var(--hero2));border-color:transparent;color:var(--hero-ink)}
+  .hero .saved,.hero .pct-big{color:#fff}
+  .hero .of,.hero .pct-row{color:var(--hero-muted)}
   .hero .saved{font-size:34px;font-weight:800;letter-spacing:-.5px}
   .hero .saved small{font-size:16px;color:var(--muted);font-weight:600}
   .hero .of{color:var(--muted);font-size:14px;margin-top:2px}
-  .bar{height:16px;background:#0c1424;border-radius:999px;overflow:hidden;margin:16px 0 8px;border:1px solid var(--line)}
+  .bar{height:16px;background:rgba(0,0,0,.25);border-radius:999px;overflow:hidden;margin:16px 0 8px;border:1px solid rgba(255,255,255,.12)}
   .bar > i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .6s cubic-bezier(.2,.7,.2,1)}
   .pct-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:600}
   .pct-big{font-size:20px;font-weight:800;color:var(--accent)}
@@ -56,7 +84,7 @@
   .stat .lbl{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
   .stat .val{font-size:18px;font-weight:800;margin-top:4px}
 
-  .motiv{background:linear-gradient(135deg,#1a2b1a,#132116);border-color:#2a4a2f;text-align:center;font-weight:600;font-size:15px;line-height:1.5}
+  .motiv{background:var(--card2);border-color:var(--line);text-align:center;font-weight:600;font-size:15px;line-height:1.5}
   .motiv .emoji{font-size:26px;display:block;margin-bottom:6px}
 
   .eta{display:flex;justify-content:space-around;text-align:center;gap:8px}
@@ -120,7 +148,7 @@
   .month-goal{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .month-goal .big{font-size:22px;font-weight:800}
   .month-goal .sub{color:var(--muted);font-size:13px}
-  .minibar{height:12px;background:#0c1424;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .minibar{height:12px;background:var(--card2);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
   .minibar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .5s}
   .chips{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
   .chip{flex:1;min-width:90px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;cursor:pointer}
@@ -241,14 +269,88 @@
   .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
   .lightbox.open{display:flex}
   .lightbox img{max-width:100%;max-height:100%;border-radius:12px}
+
+  /* ================= REDISEÑO (verde lima moderno) ================= */
+  body{transition:background .25s,color .25s}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin:12px 0}
+
+  /* Encabezado con saludo */
+  .apphdr{display:flex;align-items:center;justify-content:space-between;padding:16px 2px 6px;text-align:left}
+  .apphdr .greet .hi{font-size:20px;font-weight:800;color:var(--text)}
+  .apphdr .greet .sub{font-size:13px;color:var(--muted);margin-top:2px;text-transform:capitalize}
+  .icon-btn{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);
+    font-size:19px;display:grid;place-items:center;cursor:pointer;box-shadow:var(--shadow)}
+  .icon-btn:active{transform:scale(.94)}
+
+  /* Hero de balance (verde) */
+  .hero-card{background:linear-gradient(150deg,var(--hero1),var(--hero2));border-radius:24px;padding:22px 20px;color:var(--hero-ink);
+    box-shadow:0 14px 34px rgba(20,83,45,.28);margin:6px 0 4px;text-align:center;position:relative;overflow:hidden}
+  .hero-card::after{content:"";position:absolute;right:-40px;top:-40px;width:150px;height:150px;border-radius:50%;background:rgba(190,242,100,.14)}
+  .hero-card .hl{font-size:13px;font-weight:600;letter-spacing:.04em;color:var(--hero-muted);text-transform:uppercase;position:relative}
+  .hero-card .hb{font-size:38px;font-weight:800;letter-spacing:-1px;margin-top:4px;color:#fff;position:relative}
+  .hero-card .hb.neg{color:#fecaca}
+  .hero-card .hb.pos{color:#eaffd6}
+  .hero-card .hs{font-size:13px;color:var(--hero-muted);margin-top:6px;position:relative}
+
+  /* Acciones rápidas circulares */
+  .qa{display:flex;gap:8px;margin:12px 0 2px}
+  .qa-item{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;
+    color:var(--text);font-weight:700;font-size:12px}
+  .qa-item .qa-ic{width:56px;height:56px;border-radius:18px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+    display:grid;place-items:center;font-size:23px}
+  .qa-item:active .qa-ic{transform:scale(.94);border-color:var(--accent)}
+
+  /* Grid de totales */
+  .fin-break{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .fin-break .b{background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:12px}
+
+  /* Secciones desplegables */
+  .collap{padding:6px 16px}
+  .collap-head{width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;cursor:pointer;padding:12px 0;color:var(--text)}
+  .collap-head h2{margin:0;flex:1;text-align:left;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--text)}
+  .collap-head .collap-count{background:var(--accent);color:#fff;font-size:12px;font-weight:800;min-width:22px;height:22px;
+    padding:0 7px;border-radius:999px;display:grid;place-items:center}
+  .collap-head .collap-count:empty{display:none}
+  .collap-head .cv{width:30px;height:30px;flex:0 0 30px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+    display:grid;place-items:center;font-size:15px;color:var(--muted);transition:transform .28s;line-height:1}
+  .collap.open .collap-head .cv{transform:rotate(180deg)}
+  .collap-body{max-height:0;overflow:hidden;transition:max-height .32s ease}
+  .collap.open .collap-body{max-height:9000px}
+  .collap-inner{padding:2px 0 16px}
+
+  /* Botones */
+  .btn.primary{background:var(--accent);color:#fff}
+  .fab{background:var(--accent);color:#fff;box-shadow:0 12px 26px rgba(22,163,74,.38);border-radius:16px}
+  .fab-fin{background:var(--accent);color:#fff;box-shadow:0 12px 26px rgba(22,163,74,.38)}
+  .add-row{background:var(--card2);color:var(--muted)}
+  .scan-row{border-style:solid;border-color:var(--accent);color:var(--accent);background:rgba(22,163,74,.09)}
+
+  /* Barra de pestañas */
+  .tabbar{background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(20,45,28,.06)}
+  .tabbar button{color:var(--muted)}
+  .tabbar button.active{color:var(--accent)}
+  .tabbar button.active .ico{transform:translateY(-1px)}
+
+  /* Chevron del préstamo (más visible) */
+  .loan-head{display:flex;align-items:center;gap:11px;cursor:pointer}
+  .cv-sm{width:26px;height:26px;flex:0 0 26px;border-radius:50%;background:var(--card2);border:1px solid var(--line);
+    display:grid;place-items:center;font-size:13px;color:var(--muted);transition:transform .25s}
+  .loan-item.open .cv-sm{transform:rotate(180deg);color:var(--accent);border-color:var(--accent)}
+
+  /* Ajustes tema claro para elementos con tinte */
+  html[data-theme="light"] .stat,html[data-theme="light"] .mv,html[data-theme="light"] .item{box-shadow:0 1px 2px rgba(20,45,28,.04)}
+  html[data-theme="light"] input,html[data-theme="light"] textarea{background:var(--card2)}
+  .goal-img{background:var(--card)}
 </style>
 </head>
 <body>
 
-<div id="viewAhorro" class="view">
+<div id="viewAhorro" class="view" hidden>
 <header>
-  <div class="eyebrow">Mi meta de ahorro</div>
-  <h1>🚙 Toyota Fortuner</h1>
+  <div class="apphdr">
+    <div class="greet"><div class="hi">Mi ahorro 🚙</div><div class="sub">Meta: Toyota Fortuner</div></div>
+    <button class="icon-btn theme-toggle" aria-label="Cambiar tema">🌙</button>
+  </div>
   <button class="goal-edit" id="editGoal">Objetivo: <span id="goalTxt">₲ 230.000.000</span> ✏️</button>
   <img class="goal-img" src="fortuner.jpg" alt="Toyota Fortuner" loading="lazy">
 </header>
@@ -323,17 +425,26 @@
 <div id="list"></div>
 </div><!-- /viewAhorro -->
 
-<div id="viewFinanzas" class="view" hidden>
-  <header>
-    <div class="eyebrow">Finanzas del mes</div>
-    <h1>💳 Mis cuentas</h1>
-    <button class="goal-edit" id="finMonthLbl">—</button>
+<div id="viewFinanzas" class="view">
+  <header class="apphdr">
+    <div class="greet"><div class="hi">Hola, Bruno 👋</div><div class="sub" id="finMonthLbl">—</div></div>
+    <button class="icon-btn theme-toggle" aria-label="Cambiar tema">🌙</button>
   </header>
 
-  <section class="card fin-hero">
-    <div class="lbl">Te sobra este mes</div>
-    <div class="big" id="finLeft">₲ 0</div>
-    <div class="sub" id="finLeftSub">Cargá tus ingresos para empezar.</div>
+  <section class="hero-card">
+    <div class="hl">Te sobra este mes</div>
+    <div class="hb" id="finLeft">₲ 0</div>
+    <div class="hs" id="finLeftSub">Cargá tus ingresos para empezar.</div>
+  </section>
+
+  <section class="qa">
+    <button class="qa-item" id="qaScan"><span class="qa-ic">📸</span>Escanear</button>
+    <button class="qa-item" id="qaGasto"><span class="qa-ic">➕</span>Gasto</button>
+    <button class="qa-item" id="qaIngreso"><span class="qa-ic">💰</span>Ingresos</button>
+    <button class="qa-item" id="qaAhorro"><span class="qa-ic">🚙</span>Ahorro</button>
+  </section>
+
+  <section class="card">
     <div class="fin-break">
       <div class="b"><div class="k">Ingresos</div><div class="v inc" id="finInc">₲ 0</div></div>
       <div class="b"><div class="k">Gastos fijos</div><div class="v exp" id="finFix">₲ 0</div></div>
@@ -342,56 +453,61 @@
     </div>
   </section>
 
-  <section class="card">
-    <div class="ch"><h2>🔔 Próximos pagos</h2></div>
-    <div class="notif-cta" id="notifCta">
-      <div class="txt" id="notifTxt">Activá los recordatorios para que te avise antes de cada vencimiento.</div>
-      <button id="notifBtn">Activar</button>
-    </div>
-    <div id="billsBody"></div>
+  <section class="card collap open" data-collap="bills">
+    <button class="collap-head" onclick="toggleCollap('bills')"><h2>🔔 Próximos pagos</h2><span class="collap-count" id="billsCount"></span><span class="cv">⌄</span></button>
+    <div class="collap-body"><div class="collap-inner">
+      <div class="notif-cta" id="notifCta">
+        <div class="txt" id="notifTxt">Activá los recordatorios para que te avise antes de cada vencimiento.</div>
+        <button id="notifBtn">Activar</button>
+      </div>
+      <div id="billsBody"></div>
+    </div></div>
   </section>
 
-  <section class="card">
-    <div class="ch">
-      <h2>💰 Ingresos mensuales</h2>
-      <button class="link" id="editIncome">Editar ✏️</button>
-    </div>
-    <div class="bank" id="incomeBody"></div>
+  <section class="card collap" data-collap="income">
+    <button class="collap-head" onclick="toggleCollap('income')"><h2>💰 Ingresos</h2><span class="cv">⌄</span></button>
+    <div class="collap-body"><div class="collap-inner">
+      <div class="bank" id="incomeBody"></div>
+      <button class="add-row" id="editIncome" style="margin-top:12px">✏️ Editar ingresos</button>
+    </div></div>
   </section>
 
-  <section class="card">
-    <div class="ch"><h2>📌 Gastos fijos</h2></div>
-    <div id="fixedBody"></div>
-    <button class="add-row" id="addFixed">＋ Agregar gasto fijo</button>
+  <section class="card collap" data-collap="fixed">
+    <button class="collap-head" onclick="toggleCollap('fixed')"><h2>📌 Gastos fijos</h2><span class="cv">⌄</span></button>
+    <div class="collap-body"><div class="collap-inner">
+      <div id="fixedBody"></div>
+      <button class="add-row" id="addFixed">＋ Agregar gasto fijo</button>
+    </div></div>
   </section>
 
-  <section class="card">
-    <div class="ch"><h2>🏦 Préstamos y cuotas</h2></div>
-    <div id="loansBody"></div>
-    <button class="add-row" id="addLoan">＋ Agregar préstamo</button>
+  <section class="card collap" data-collap="loans">
+    <button class="collap-head" onclick="toggleCollap('loans')"><h2>🏦 Préstamos y cuotas</h2><span class="cv">⌄</span></button>
+    <div class="collap-body"><div class="collap-inner">
+      <div id="loansBody"></div>
+      <button class="add-row" id="addLoan">＋ Agregar préstamo</button>
+    </div></div>
   </section>
 
-  <section class="card">
-    <div class="ch">
-      <h2>🧾 Gastos variables del mes</h2>
-      <span class="pct-big" id="varHeadTot" style="font-size:16px">₲ 0</span>
-    </div>
-    <div id="varCats"></div>
-    <div id="varsBody"></div>
-    <button class="add-row scan-row" id="scanVar">📸 Escanear factura (leer monto solo)</button>
-    <button class="add-row" id="addVar">＋ Agregar gasto a mano</button>
-    <input type="file" id="scanPhoto" accept="image/*" capture="environment" style="display:none">
+  <section class="card collap open" data-collap="vars">
+    <button class="collap-head" onclick="toggleCollap('vars')"><h2>🧾 Gastos del mes</h2><span class="collap-count" id="varHeadTot"></span><span class="cv">⌄</span></button>
+    <div class="collap-body"><div class="collap-inner">
+      <div id="varCats"></div>
+      <div id="varsBody"></div>
+      <button class="add-row scan-row" id="scanVar">📸 Escanear factura (leer monto solo)</button>
+      <button class="add-row" id="addVar">＋ Agregar gasto a mano</button>
+      <input type="file" id="scanPhoto" accept="image/*" capture="environment" style="display:none">
+    </div></div>
   </section>
 </div><!-- /viewFinanzas -->
 
 <footer>Datos guardados en este dispositivo · Funciona sin conexión</footer>
 
-<button class="fab" id="fab">＋ Registrar movimiento</button>
-<button class="fab fab-fin" id="fabFin" hidden>＋ Gasto</button>
+<button class="fab" id="fab" hidden>＋ Registrar movimiento</button>
+<button class="fab fab-fin" id="fabFin">＋ Gasto</button>
 
 <nav class="tabbar">
-  <button id="tabAhorro" class="active"><span class="ico">🚙</span>Ahorro</button>
-  <button id="tabFinanzas"><span class="ico">💳</span>Finanzas<span class="dot" id="tabDot"></span></button>
+  <button id="tabFinanzas" class="active"><span class="ico">🏠</span>Inicio<span class="dot" id="tabDot"></span></button>
+  <button id="tabAhorro"><span class="ico">🚙</span>Ahorro</button>
 </nav>
 
 <!-- Modal movimiento -->
@@ -883,7 +999,7 @@ function finRender(){
   $("finInc").textContent=fmt(inc); $("finFix").textContent=fmt(fx);
   $("finLoans").textContent=fmt(ln); $("finVarTot").textContent=fmt(vt);
   $("varHeadTot").textContent=fmt(vt);
-  const le=$("finLeft"); le.textContent=fmt(left); le.className="big "+(left<0?"neg":"pos");
+  const le=$("finLeft"); le.textContent=fmt(left); le.className="hb "+(left<0?"neg":"pos");
   if(inc<=0) $("finLeftSub").textContent="Cargá tus ingresos para empezar.";
   else if(left<0) $("finLeftSub").textContent="Estás "+fmt(-left)+" por encima de tus ingresos.";
   else $("finLeftSub").textContent="Después de fijos, cuotas y variables ya cargados.";
@@ -903,6 +1019,8 @@ function renderIncome(){
 function renderBills(){
   const el=$("billsBody");
   const bills=pendingBills().sort((a,b)=> a.st.due-b.st.due);
+  const soon=bills.filter(b=>!b.paid && b.st.diff<=7).length;
+  const bc=$("billsCount"); if(bc) bc.textContent = soon>0? soon : "";
   if(bills.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Agregá gastos fijos o préstamos y aparecerán acá con sus vencimientos.</div>'; return; }
   el.innerHTML=bills.map(b=>{
     let cls, txt;
@@ -961,11 +1079,12 @@ function renderLoans(){
       : nx ? daysTxt(statusFor(new Date(nx.due+"T00:00:00"),false).diff)+" · "+fmtDate(nx.due)
       : "Sin cuotas pendientes";
     const open=expandedLoans.has(l.id);
-    return `<div class="item" style="flex-direction:column;align-items:stretch;gap:0">
-      <div style="display:flex;align-items:center;gap:11px;cursor:pointer" onclick="toggleLoan(${l.id})">
+    return `<div class="item loan-item ${open?'open':''}" style="flex-direction:column;align-items:stretch;gap:0">
+      <div class="loan-head" onclick="toggleLoan(${l.id})">
         <div class="ic">🏦</div>
-        <div class="info"><div class="t1">${escapeHtml(l.name)} <span style="color:var(--muted);font-size:12px">${open?'▲':'▼'}</span></div>
+        <div class="info"><div class="t1">${escapeHtml(l.name)}</div>
           <div class="t2">${l.variable?"Cuota variable":fmt(l.amount)} · ${nextTxt}</div></div>
+        <span class="cv-sm">⌄</span>
         <div class="acts" onclick="event.stopPropagation()"><button onclick="editLoan(${l.id})" aria-label="Editar">✏️</button><button onclick="delLoan(${l.id})" aria-label="Borrar">🗑️</button></div>
       </div>
       <div class="loan-prog">
@@ -1103,10 +1222,13 @@ window.saveLoan=function(id){
   const name=$("oName").value.trim(), amount=parseAmt($("oAmt").value), variable=$("oVar").checked;
   let day=Math.min(31,Math.max(1,digits($("oDay").value)||1));
   const leftN=digits($("oLeft").value), prevN=digits($("oPrev").value);
-  if(!name){ $("oName").focus(); return; }
+  if(!name){ $("oName").focus(); toast("Ponele un nombre al préstamo"); return; }
+  if(!id && leftN<=0){ $("oLeft").focus(); toast("Cargá cuántas cuotas te faltan"); return; }
+  let newVarId=null;
   if(id){ const l=fin.loans.find(x=>x.id===id); if(l){ l.name=name; l.amount=amount; l.variable=variable; l.dueDay=day; l.paidPrev=prevN; reconcileSchedule(l, leftN, day, amount); } }
-  else { const l={id:uid(),name,amount,variable,dueDay:day,paidPrev:prevN,cuotas:buildSchedule(leftN,day,amount)}; l.endDate=l.cuotas.length?l.cuotas[l.cuotas.length-1].due:""; fin.loans.push(l); }
+  else { const l={id:uid(),name,amount,variable,dueDay:day,paidPrev:prevN,cuotas:buildSchedule(leftN,day,amount)}; l.endDate=l.cuotas.length?l.cuotas[l.cuotas.length-1].due:""; fin.loans.push(l); expandedLoans.add(l.id); if(variable) newVarId=l.id; }
   closeFin(); finRender(); scheduleNotifs();
+  if(newVarId) toast("Listo. Tocá el monto de cada cuota para ajustarla");
 };
 window.editLoan=id=>loanForm(fin.loans.find(x=>x.id===id));
 window.delLoan=function(id){ if(!confirm("¿Borrar este préstamo?"))return; fin.loans=fin.loans.filter(x=>x.id!==id); finRender(); };
@@ -1303,13 +1425,45 @@ $("addVar").addEventListener("click",()=>varForm(null));
 $("scanVar").addEventListener("click",()=>$("scanPhoto").click());
 $("scanPhoto").addEventListener("change",e=>{ const f=e.target.files[0]; e.target.value=""; if(f) scanReceipt(f); });
 
+/* ---------- Tema claro/oscuro ---------- */
+function applyTheme(t){
+  document.documentElement.setAttribute("data-theme", t);
+  document.querySelectorAll(".theme-toggle").forEach(b=> b.textContent = t==="dark" ? "☀️" : "🌙");
+  const meta=document.querySelector('meta[name="theme-color"]'); if(meta) meta.setAttribute("content", t==="dark" ? "#0b1120" : "#14532d");
+  try{ localStorage.setItem("fin_theme", t); }catch(e){}
+}
+function initTheme(){ let t="light"; try{ t=localStorage.getItem("fin_theme")||"light"; }catch(e){} applyTheme(t); }
+document.querySelectorAll(".theme-toggle").forEach(b=> b.addEventListener("click",()=>{
+  applyTheme(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark");
+}));
+initTheme();
+
+/* ---------- Secciones desplegables ---------- */
+function readCollap(){ try{ return JSON.parse(localStorage.getItem("fin_collap")||"{}"); }catch(e){ return {}; } }
+window.toggleCollap=function(key){
+  const sec=document.querySelector('.collap[data-collap="'+key+'"]'); if(!sec)return;
+  sec.classList.toggle("open");
+  const c=readCollap(); c[key]=sec.classList.contains("open");
+  try{ localStorage.setItem("fin_collap", JSON.stringify(c)); }catch(e){}
+};
+(function initCollap(){ const c=readCollap(); document.querySelectorAll(".collap").forEach(sec=>{ const k=sec.getAttribute("data-collap"); if(k in c) sec.classList.toggle("open", !!c[k]); }); })();
+
+/* ---------- Acciones rápidas ---------- */
+$("qaScan").addEventListener("click",()=>$("scanPhoto").click());
+$("qaGasto").addEventListener("click",()=>varForm(null));
+$("qaIngreso").addEventListener("click",editIncome);
+$("qaAhorro").addEventListener("click",()=>showTab("ahorro"));
+
 /* Init finanzas */
 finRender();
 paintNotifCta();
 (function(){
   const p=new URLSearchParams(location.search);
-  if(p.get("tab")==="finanzas") showTab("finanzas");
-  else { try{ if(localStorage.getItem("fin_tab")==="finanzas") showTab("finanzas"); }catch(e){} }
+  let want="finanzas";
+  if(p.get("tab")==="ahorro" || p.get("action")==="deposit") want="ahorro";
+  else if(p.get("tab")==="finanzas") want="finanzas";
+  else { try{ if(localStorage.getItem("fin_tab")==="ahorro") want="ahorro"; }catch(e){} }
+  showTab(want);
 })();
 scheduleNotifs(); checkDueNow();
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ finRender(); checkDueNow(); } });

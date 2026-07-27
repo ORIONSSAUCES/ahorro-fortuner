@@ -13,12 +13,19 @@ PWA en español, mobile-first, sin backend. Todos los datos se guardan en el dis
 
 ## Estructura de la app
 
-La app tiene **dos pestañas** (barra inferior de navegación):
+La app tiene **dos pestañas** (barra inferior). Desde el rediseño, el **Inicio es Finanzas**:
 
-1. **🚙 Ahorro** — la pantalla original (meta Toyota Fortuner).
-2. **💳 Finanzas** — manejo de finanzas personales del mes (agregada después).
+1. **🏠 Inicio (Finanzas)** — pantalla principal: saludo, hero de "te sobra este mes", acciones rápidas y secciones desplegables.
+2. **🚙 Ahorro** — la pantalla original (meta Toyota Fortuner), en su propia pestaña, bien separada.
 
 Todo vive en un solo archivo `index.html` (HTML + CSS + JS). `sw.js` es el service worker y `manifest.json` la config de PWA/instalación/widget.
+
+### Diseño (rediseño "verde lima moderno")
+- **Tema claro/oscuro:** claro por defecto. Toggle (`.theme-toggle` en el header) que setea `data-theme` en `<html>` y guarda en `fin_theme`. Los colores son variables CSS (mismos nombres `--card`, `--card2`, `--accent`, etc.) con override en `html[data-theme="dark"]`.
+- **Hero de balance** en verde (`--hero1/--hero2`) en ambos temas.
+- **Secciones desplegables** (`.collap` con `.collap-head` + chevron `.cv`): estado recordado en `fin_collap`. Préstamos usa un chevron `.cv-sm` más visible.
+- **Acciones rápidas** circulares en el inicio (Escanear, Gasto, Ingresos, Ahorro).
+- Al cambiar de diseño se mantienen los IDs para no romper el JS.
 
 ## Pestaña Ahorro (objetivo original)
 
