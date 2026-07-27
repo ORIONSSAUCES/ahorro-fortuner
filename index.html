@@ -91,7 +91,7 @@
   /* Modal */
   .overlay{position:fixed;inset:0;background:rgba(3,7,18,.7);backdrop-filter:blur(4px);display:none;align-items:flex-end;justify-content:center;z-index:100}
   .overlay.open{display:flex}
-  .sheet{background:var(--card);width:100%;max-width:520px;border-radius:22px 22px 0 0;border:1px solid var(--line);border-bottom:none;padding:20px 18px calc(env(safe-area-inset-bottom) + 22px);animation:up .28s cubic-bezier(.2,.8,.2,1)}
+  .sheet{background:var(--card);width:100%;max-width:520px;border-radius:22px 22px 0 0;border:1px solid var(--line);border-bottom:none;padding:20px 18px calc(env(safe-area-inset-bottom) + 22px);animation:up .28s cubic-bezier(.2,.8,.2,1);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch}
   @keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
   .sheet h3{margin:0 0 16px;font-size:19px;font-weight:800;text-align:center}
   .seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px}
