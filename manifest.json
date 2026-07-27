@@ -27,6 +27,13 @@
       "description": "Abrir el resumen de mi ahorro",
       "url": "./index.html",
       "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Cargar gasto",
+      "short_name": "Gasto",
+      "description": "Ir a Finanzas para registrar un gasto",
+      "url": "./index.html?tab=finanzas",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
     }
   ],
   "widgets": [

@@ -29,7 +29,7 @@
     background:radial-gradient(1200px 600px at 50% -10%,#16233f 0%,var(--bg) 55%);
     color:var(--text);
     min-height:100dvh;
-    padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 90px);
+    padding:env(safe-area-inset-top) 14px calc(env(safe-area-inset-bottom) + 150px);
     max-width:520px;margin:0 auto;
     -webkit-font-smoothing:antialiased;
   }
@@ -143,10 +143,90 @@
   .backup button span{font-size:20px}
 
   footer{text-align:center;color:var(--muted);font-size:11.5px;padding:8px 0 4px;opacity:.7}
+
+  /* ---------- Pestañas ---------- */
+  .view[hidden]{display:none}
+  .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:60;display:flex;max-width:520px;margin:0 auto;
+    background:rgba(11,17,32,.94);backdrop-filter:blur(12px);border-top:1px solid var(--line);
+    padding:7px 10px calc(env(safe-area-inset-bottom) + 7px)}
+  .tabbar button{flex:1;background:none;border:none;color:var(--muted);font-weight:700;font-size:12px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px;border-radius:12px;cursor:pointer;position:relative}
+  .tabbar button .ico{font-size:21px;line-height:1}
+  .tabbar button.active{color:var(--accent)}
+  .tabbar .dot{position:absolute;top:2px;right:calc(50% - 22px);min-width:17px;height:17px;padding:0 4px;
+    background:var(--danger);color:#fff;border-radius:999px;font-size:11px;font-weight:800;display:none;place-items:center;line-height:17px}
+  .tabbar .dot.show{display:grid}
+
+  .fab-fin{background:linear-gradient(90deg,#a855f7,#ec4899);color:#fff;box-shadow:0 12px 28px rgba(168,85,247,.35)}
+  .fab[hidden]{display:none}
+  .fab{bottom:calc(env(safe-area-inset-bottom) + 78px)}
+
+  /* ---------- Finanzas ---------- */
+  .fin-hero{background:linear-gradient(160deg,#1a1430,#131c31 60%);border-color:#3a2a5e;text-align:center}
+  .fin-hero .lbl{color:var(--muted);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+  .fin-hero .big{font-size:34px;font-weight:800;letter-spacing:-.5px;margin-top:2px}
+  .fin-hero .big.neg{color:var(--danger)}
+  .fin-hero .big.pos{color:var(--accent)}
+  .fin-hero .sub{color:var(--muted);font-size:13px;margin-top:4px}
+  .fin-break{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .fin-break .b{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px;text-align:left}
+  .fin-break .b .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .fin-break .b .v{font-weight:800;font-size:15px;margin-top:3px}
+  .fin-break .b .v.inc{color:var(--accent)}
+  .fin-break .b .v.exp{color:var(--danger)}
+
+  .item{display:flex;align-items:center;gap:11px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card2);margin-bottom:10px}
+  .item .ic{width:36px;height:36px;flex:0 0 36px;border-radius:10px;display:grid;place-items:center;font-size:17px;background:var(--card)}
+  .item .info{flex:1;min-width:0}
+  .item .t1{font-weight:800;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .item .t2{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .item .amt{font-weight:800;font-size:15px;white-space:nowrap}
+  .item .amt.exp{color:var(--danger)}
+  .item .acts{display:flex;gap:2px}
+  .item .acts button{background:none;border:none;color:var(--muted);font-size:16px;padding:7px;cursor:pointer;border-radius:8px}
+  .item .acts button:active{background:var(--line)}
+  .item .thumb{width:40px;height:40px;flex:0 0 40px;border-radius:9px;object-fit:cover;border:1px solid var(--line);cursor:pointer}
+
+  .pill{font-size:11px;font-weight:800;padding:3px 8px;border-radius:999px;white-space:nowrap}
+  .pill.ok{background:rgba(34,197,94,.15);color:var(--accent)}
+  .pill.due{background:rgba(245,158,11,.15);color:var(--warn)}
+  .pill.late{background:rgba(239,68,68,.15);color:var(--danger)}
+  .pay-btn{background:var(--card);border:1px solid var(--line);color:var(--text);font-weight:700;font-size:12.5px;
+    padding:7px 11px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .pay-btn.done{background:rgba(34,197,94,.12);border-color:#2a4a2f;color:var(--accent)}
+  .pay-btn:active{transform:scale(.97)}
+
+  .loan-prog{margin-top:9px}
+  .loan-prog .minibar{height:9px}
+  .loan-prog .lp-row{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:6px}
+
+  .notif-cta{display:flex;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
+  .notif-cta .txt{flex:1;font-size:13px;color:var(--muted)}
+  .notif-cta button{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#04180c;border:none;font-weight:800;font-size:13px;padding:10px 14px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .notif-cta button.on{background:var(--card);color:var(--accent);border:1px solid #2a4a2f}
+
+  .add-row{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--muted);font-weight:700;
+    font-size:14px;padding:13px;border-radius:12px;cursor:pointer;margin-top:2px}
+  .add-row:active{border-color:var(--accent)}
+
+  .photo-pick{display:flex;gap:10px;align-items:center;margin-bottom:14px}
+  .photo-pick .pp-btn{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:12px;
+    padding:13px;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+  .photo-pick .pp-btn:active{border-color:var(--accent2)}
+  .photo-pick .pp-prev{width:56px;height:56px;flex:0 0 56px;border-radius:11px;object-fit:cover;border:1px solid var(--line);display:none}
+  .photo-pick .pp-prev.show{display:block}
+  .seg3{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .seg3 button{background:var(--card2);border:1px solid var(--line);color:var(--muted);font-weight:700;font-size:13px;
+    padding:9px 12px;border-radius:999px;cursor:pointer}
+  .seg3 button.on{background:rgba(168,85,247,.2);color:#c084fc;border-color:#5b3a8e}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:300;display:none;align-items:center;justify-content:center;padding:20px}
+  .lightbox.open{display:flex}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:12px}
 </style>
 </head>
 <body>
 
+<div id="viewAhorro" class="view">
 <header>
   <div class="eyebrow">Mi meta de ahorro</div>
   <h1>🚙 Toyota Fortuner</h1>
@@ -222,10 +302,75 @@
 
 <h2>📜 Historial</h2>
 <div id="list"></div>
+</div><!-- /viewAhorro -->
+
+<div id="viewFinanzas" class="view" hidden>
+  <header>
+    <div class="eyebrow">Finanzas del mes</div>
+    <h1>💳 Mis cuentas</h1>
+    <button class="goal-edit" id="finMonthLbl">—</button>
+  </header>
+
+  <section class="card fin-hero">
+    <div class="lbl">Te sobra este mes</div>
+    <div class="big" id="finLeft">₲ 0</div>
+    <div class="sub" id="finLeftSub">Cargá tus ingresos para empezar.</div>
+    <div class="fin-break">
+      <div class="b"><div class="k">Ingresos</div><div class="v inc" id="finInc">₲ 0</div></div>
+      <div class="b"><div class="k">Gastos fijos</div><div class="v exp" id="finFix">₲ 0</div></div>
+      <div class="b"><div class="k">Cuotas préstamos</div><div class="v exp" id="finLoans">₲ 0</div></div>
+      <div class="b"><div class="k">Gastos variables</div><div class="v exp" id="finVarTot">₲ 0</div></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="ch"><h2>🔔 Próximos pagos</h2></div>
+    <div class="notif-cta" id="notifCta">
+      <div class="txt" id="notifTxt">Activá los recordatorios para que te avise antes de cada vencimiento.</div>
+      <button id="notifBtn">Activar</button>
+    </div>
+    <div id="billsBody"></div>
+  </section>
+
+  <section class="card">
+    <div class="ch">
+      <h2>💰 Ingresos mensuales</h2>
+      <button class="link" id="editIncome">Editar ✏️</button>
+    </div>
+    <div class="bank" id="incomeBody"></div>
+  </section>
+
+  <section class="card">
+    <div class="ch"><h2>📌 Gastos fijos</h2></div>
+    <div id="fixedBody"></div>
+    <button class="add-row" id="addFixed">＋ Agregar gasto fijo</button>
+  </section>
+
+  <section class="card">
+    <div class="ch"><h2>🏦 Préstamos y cuotas</h2></div>
+    <div id="loansBody"></div>
+    <button class="add-row" id="addLoan">＋ Agregar préstamo</button>
+  </section>
+
+  <section class="card">
+    <div class="ch">
+      <h2>🧾 Gastos variables del mes</h2>
+      <span class="pct-big" id="varHeadTot" style="font-size:16px">₲ 0</span>
+    </div>
+    <div id="varsBody"></div>
+    <button class="add-row" id="addVar">＋ Agregar gasto (combustible, comida…)</button>
+  </section>
+</div><!-- /viewFinanzas -->
 
 <footer>Datos guardados en este dispositivo · Funciona sin conexión</footer>
 
 <button class="fab" id="fab">＋ Registrar movimiento</button>
+<button class="fab fab-fin" id="fabFin" hidden>＋ Gasto</button>
+
+<nav class="tabbar">
+  <button id="tabAhorro" class="active"><span class="ico">🚙</span>Ahorro</button>
+  <button id="tabFinanzas"><span class="ico">💳</span>Finanzas<span class="dot" id="tabDot"></span></button>
+</nav>
 
 <!-- Modal movimiento -->
 <div class="overlay" id="overlay">
@@ -247,6 +392,14 @@
     </div>
   </div>
 </div>
+
+<!-- Modal finanzas (contenido dinámico) -->
+<div class="overlay" id="finOverlay">
+  <div class="sheet" id="finSheet"></div>
+</div>
+
+<!-- Visor de foto -->
+<div class="lightbox" id="lightbox"><img id="lightboxImg" alt="Factura"></div>
 
 <script>
 const DEFAULT_GOAL = 230000000;
@@ -543,7 +696,7 @@ function editBank(){
 
 /* ---------- Respaldo ---------- */
 function exportData(){
-  const data = { app:"mi-ahorro", version:1, exportedAt:new Date().toISOString(), goal, cfg, moves };
+  const data = { app:"mi-ahorro", version:2, exportedAt:new Date().toISOString(), goal, cfg, moves, fin };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -564,6 +717,7 @@ function importData(file){
       moves = data.moves;
       if(typeof data.goal === "number" && data.goal > 0) goal = data.goal;
       if(data.cfg && typeof data.cfg === "object") cfg = Object.assign({ bank:"", account:"", holder:"", monthly:0 }, data.cfg);
+      if(data.fin && typeof data.fin === "object"){ fin = normalizeFin(data.fin); saveFin(); finRender(); }
       render();
       toast("Datos importados");
     }catch(e){ alert("El archivo no es un respaldo válido."); }
@@ -609,9 +763,376 @@ if(new URLSearchParams(location.search).get("action") === "deposit"){
   newMove();
 }
 
+/* ============================================================
+   FINANZAS · nueva pestaña
+   ============================================================ */
+const K_FIN = "fin_v1";
+const CATS = [["Combustible","⛽"],["Comida","🍔"],["Súper","🛒"],["Transporte","🚌"],["Salud","💊"],["Servicios","💡"],["Ocio","🎬"],["Otro","🏷️"]];
+
+function normalizeFin(f){
+  f = f || {};
+  return {
+    income: Object.assign({salary:0, quincena:0}, f.income||{}),
+    fixed: Array.isArray(f.fixed)? f.fixed : [],
+    loans: Array.isArray(f.loans)? f.loans : [],
+    vars:  Array.isArray(f.vars) ? f.vars  : []
+  };
+}
+let fin = normalizeFin(load(K_FIN, {}));
+let _pendingPhoto = null;
+
+function saveFin(){
+  try{ localStorage.setItem(K_FIN, JSON.stringify(fin)); return true; }
+  catch(e){ alert("No se pudo guardar: el almacenamiento está lleno. Probá borrar fotos viejas o exportar un respaldo."); return false; }
+}
+
+/* Helpers */
+function uid(){ return Date.now() + Math.floor(Math.random()*1000); }
+function nfmt(n){ return Math.round(n||0).toLocaleString("es-PY").replace(/,/g,"."); }
+function escapeAttr(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+function fmtDate(s){ return new Date(s+"T00:00:00").toLocaleDateString("es-PY",{day:"2-digit",month:"short",year:"numeric"}); }
+function ymOf(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
+function curYM(){ return ymOf(new Date()); }
+function catIcon(c){ const f=CATS.find(x=>x[0]===c); return f? f[1] : "🏷️"; }
+
+/* Cálculos */
+function incomeTotal(){ return (fin.income.salary||0) + (fin.income.quincena||0); }
+function fixedTotal(){ return fin.fixed.reduce((s,f)=> s+(f.amount||0), 0); }
+function loansMonthlyTotal(){ return fin.loans.filter(l=>(l.paid||0)<(l.total||0)).reduce((s,l)=> s+(l.amount||0), 0); }
+function varsThisMonth(){ const m=curYM(); return fin.vars.filter(v=> ymOf(new Date(v.date+"T00:00:00"))===m); }
+function varsTotal(){ return varsThisMonth().reduce((s,v)=> s+(v.amount||0), 0); }
+
+function billStatus(dueDay, paid){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const y=today.getFullYear(), mo=today.getMonth();
+  const dim=new Date(y,mo+1,0).getDate();
+  const day=Math.min(Math.max(1,dueDay||1), dim);
+  const due=new Date(y,mo,day);
+  const diff=Math.round((due-today)/86400000);
+  let state;
+  if(paid) state="ok";
+  else if(diff<0) state="late";
+  else if(diff<=5) state="due";
+  else state="upcoming";
+  return {state, diff, due};
+}
+function pendingBills(){
+  const m=curYM(); const list=[];
+  fin.fixed.forEach(f=>{ const paid=!!(f.paid&&f.paid[m]); list.push({kind:"fixed",id:f.id,name:f.name,amount:f.amount,dueDay:f.dueDay,paid,st:billStatus(f.dueDay,paid)}); });
+  fin.loans.forEach(l=>{ if((l.paid||0)>=(l.total||0)) return; const paid=!!(l.paidMonths&&l.paidMonths[m]); list.push({kind:"loan",id:l.id,name:l.name,amount:l.amount,dueDay:l.dueDay,paid,st:billStatus(l.dueDay,paid)}); });
+  return list;
+}
+
+/* Render */
+function finRender(){
+  $("finMonthLbl").textContent = new Date().toLocaleDateString("es-PY",{month:"long",year:"numeric"});
+  const inc=incomeTotal(), fx=fixedTotal(), ln=loansMonthlyTotal(), vt=varsTotal();
+  const left=inc-fx-ln-vt;
+  $("finInc").textContent=fmt(inc); $("finFix").textContent=fmt(fx);
+  $("finLoans").textContent=fmt(ln); $("finVarTot").textContent=fmt(vt);
+  $("varHeadTot").textContent=fmt(vt);
+  const le=$("finLeft"); le.textContent=fmt(left); le.className="big "+(left<0?"neg":"pos");
+  if(inc<=0) $("finLeftSub").textContent="Cargá tus ingresos para empezar.";
+  else if(left<0) $("finLeftSub").textContent="Estás "+fmt(-left)+" por encima de tus ingresos.";
+  else $("finLeftSub").textContent="Después de fijos, cuotas y variables ya cargados.";
+  renderIncome(); renderBills(); renderFixed(); renderLoans(); renderVars();
+  saveFin(); updateFinBadge();
+}
+
+function renderIncome(){
+  const el=$("incomeBody"), s=fin.income.salary||0, q=fin.income.quincena||0;
+  if(!s && !q){ el.innerHTML='<div class="none">Todavía no cargaste tus ingresos. Tocá “Editar”.</div>'; return; }
+  el.innerHTML =
+    `<div class="row"><div class="k">Salario mensual</div><div class="v">${fmt(s)}</div></div>`+
+    `<div class="row"><div class="k">Quincena / extra</div><div class="v">${fmt(q)}</div></div>`+
+    `<div class="row"><div class="k">Total del mes</div><div class="v" style="color:var(--accent)">${fmt(s+q)}</div></div>`;
+}
+
+function renderBills(){
+  const el=$("billsBody");
+  const bills=pendingBills().sort((a,b)=> a.st.due-b.st.due);
+  if(bills.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Agregá gastos fijos o préstamos y aparecerán acá con sus vencimientos.</div>'; return; }
+  el.innerHTML=bills.map(b=>{
+    let cls, txt;
+    if(b.paid){ cls="ok"; txt="Pagado ✓"; }
+    else if(b.st.state==="late"){ cls="late"; txt="Vencido "+(-b.st.diff)+"d"; }
+    else if(b.st.diff===0){ cls="due"; txt="Vence hoy"; }
+    else if(b.st.state==="due"){ cls="due"; txt="En "+b.st.diff+"d"; }
+    else { cls="ok"; txt="Día "+(b.dueDay||"—"); }
+    if(b.st.state==="upcoming" && !b.paid) cls="";
+    const pill=`<span class="pill ${cls}" ${cls===""?'style="background:var(--card);color:var(--muted)"':''}>${txt}</span>`;
+    return `<div class="item">
+      <div class="ic">${b.kind==="loan"?"🏦":"📌"}</div>
+      <div class="info"><div class="t1">${escapeHtml(b.name)}</div><div class="t2">${fmt(b.amount)}${b.kind==="loan"?" · cuota":""}</div></div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+        ${pill}
+        <button class="pay-btn ${b.paid?'done':''}" onclick="togglePaid('${b.kind}',${b.id})">${b.paid?'✓ Pagado':'Marcar pagado'}</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+window.togglePaid=function(kind,id){
+  const m=curYM();
+  if(kind==="fixed"){ const f=fin.fixed.find(x=>x.id===id); if(!f)return; f.paid=f.paid||{}; f.paid[m]=!f.paid[m]; }
+  else { const l=fin.loans.find(x=>x.id===id); if(!l)return; l.paidMonths=l.paidMonths||{}; const now=!l.paidMonths[m]; l.paidMonths[m]=now; l.paid = now? Math.min(l.total||0,(l.paid||0)+1) : Math.max(0,(l.paid||0)-1); }
+  finRender(); scheduleNotifs();
+};
+
+function renderFixed(){
+  const el=$("fixedBody"), m=curYM();
+  if(fin.fixed.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Sin gastos fijos. Ej: alquiler, internet, seguro.</div>'; return; }
+  el.innerHTML=fin.fixed.map(f=>{
+    const paid=!!(f.paid&&f.paid[m]);
+    return `<div class="item">
+      <div class="ic">📌</div>
+      <div class="info"><div class="t1">${escapeHtml(f.name)}</div><div class="t2">Vence día ${f.dueDay||"—"}${paid?" · pagado este mes":""}</div></div>
+      <div class="amt exp">${fmt(f.amount)}</div>
+      <div class="acts"><button onclick="editFixed(${f.id})" aria-label="Editar">✏️</button><button onclick="delFixed(${f.id})" aria-label="Borrar">🗑️</button></div>
+    </div>`;
+  }).join("");
+}
+
+function renderLoans(){
+  const el=$("loansBody");
+  if(fin.loans.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Sin préstamos. Agregá uno para seguir cuotas pagadas y las que faltan.</div>'; return; }
+  el.innerHTML=fin.loans.map(l=>{
+    const total=l.total||0, paid=Math.min(l.paid||0,total), left=Math.max(0,total-paid);
+    const p=total>0? Math.round(paid/total*100):0, done=total>0 && paid>=total;
+    return `<div class="item" style="flex-direction:column;align-items:stretch;gap:0">
+      <div style="display:flex;align-items:center;gap:11px">
+        <div class="ic">🏦</div>
+        <div class="info"><div class="t1">${escapeHtml(l.name)}</div>
+          <div class="t2">${l.variable?"Cuota variable":fmt(l.amount)}${l.endDate?" · fin "+fmtDate(l.endDate):""}</div></div>
+        <div class="acts"><button onclick="editLoan(${l.id})" aria-label="Editar">✏️</button><button onclick="delLoan(${l.id})" aria-label="Borrar">🗑️</button></div>
+      </div>
+      <div class="loan-prog">
+        <div class="minibar"><i style="width:${p}%"></i></div>
+        <div class="lp-row"><span>Cuota ${paid}/${total} · faltan ${left}</span><span>${done?"✅ Terminado":p+"%"}</span></div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderVars(){
+  const el=$("varsBody");
+  const list=varsThisMonth().sort((a,b)=> b.date.localeCompare(a.date) || b.id-a.id);
+  if(list.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Sin gastos este mes. Cargá combustible, comida, etc.</div>'; return; }
+  el.innerHTML=list.map(v=>{
+    const left = v.photo ? `<img class="thumb" src="${v.photo}" onclick="viewPhoto(${v.id})" alt="Factura">` : `<div class="ic">${catIcon(v.cat)}</div>`;
+    return `<div class="item">
+      ${left}
+      <div class="info"><div class="t1">${escapeHtml(v.cat||"Gasto")}${v.note?" · "+escapeHtml(v.note):""}</div><div class="t2">${fmtDate(v.date)}</div></div>
+      <div class="amt exp">${fmt(v.amount)}</div>
+      <div class="acts"><button onclick="editVar(${v.id})" aria-label="Editar">✏️</button><button onclick="delVar(${v.id})" aria-label="Borrar">🗑️</button></div>
+    </div>`;
+  }).join("");
+}
+window.viewPhoto=function(id){ const v=fin.vars.find(x=>x.id===id); if(!v||!v.photo)return; $("lightboxImg").src=v.photo; $("lightbox").classList.add("open"); };
+$("lightbox").addEventListener("click",()=>$("lightbox").classList.remove("open"));
+
+/* Modales finanzas */
+function openFin(html){ $("finSheet").innerHTML=html; $("finOverlay").classList.add("open"); }
+window.closeFin=function(){ $("finOverlay").classList.remove("open"); $("finSheet").innerHTML=""; _pendingPhoto=null; };
+$("finOverlay").addEventListener("click",e=>{ if(e.target===$("finOverlay")) closeFin(); });
+function wireMoney(){ document.querySelectorAll("#finSheet .money").forEach(inp=>{ inp.addEventListener("input",e=>{ const n=parseAmt(e.target.value); e.target.value=n? nfmt(n):""; }); }); }
+function digits(v){ return parseInt((v||"").replace(/\D/g,""),10)||0; }
+
+function editIncome(){
+  const s=fin.income.salary||0, q=fin.income.quincena||0;
+  openFin(`<h3>Ingresos mensuales</h3>
+    <label>Salario mensual (₲)</label>
+    <input class="amount-input money" id="fSal" inputmode="numeric" value="${s?nfmt(s):''}" placeholder="0" autocomplete="off">
+    <label>Quincena / otro ingreso (₲)</label>
+    <input class="amount-input money" id="fQui" inputmode="numeric" value="${q?nfmt(q):''}" placeholder="0" autocomplete="off">
+    <div class="hint">El total del mes es la suma de ambos. Dejá 0 lo que no uses.</div>
+    <div class="row-btns" style="margin-top:14px"><button class="btn ghost" onclick="closeFin()">Cancelar</button><button class="btn primary" onclick="saveIncome()">Guardar</button></div>`);
+  wireMoney();
+}
+window.saveIncome=function(){ fin.income.salary=parseAmt($("fSal").value); fin.income.quincena=parseAmt($("fQui").value); closeFin(); finRender(); };
+
+function fixedForm(f){
+  openFin(`<h3>${f?"Editar":"Nuevo"} gasto fijo</h3>
+    <label>Nombre</label><input id="xName" placeholder="Ej: Alquiler, Internet" value="${f?escapeAttr(f.name):''}" autocomplete="off">
+    <label>Monto mensual (₲)</label><input class="amount-input money" id="xAmt" inputmode="numeric" value="${f?nfmt(f.amount):''}" placeholder="0" autocomplete="off">
+    <label>Día de vencimiento (1–31)</label><input id="xDay" inputmode="numeric" value="${f?(f.dueDay||''):''}" placeholder="Ej: 10" autocomplete="off">
+    <div class="row-btns" style="margin-top:14px"><button class="btn ghost" onclick="closeFin()">Cancelar</button><button class="btn primary" onclick="saveFixed(${f?f.id:'null'})">Guardar</button></div>`);
+  wireMoney();
+}
+window.saveFixed=function(id){
+  const name=$("xName").value.trim(), amount=parseAmt($("xAmt").value);
+  let day=Math.min(31,Math.max(1,digits($("xDay").value)||1));
+  if(!name || amount<=0){ $("xName").focus(); return; }
+  if(id){ const f=fin.fixed.find(x=>x.id===id); if(f){ f.name=name; f.amount=amount; f.dueDay=day; } }
+  else fin.fixed.push({id:uid(),name,amount,dueDay:day,paid:{}});
+  closeFin(); finRender(); scheduleNotifs();
+};
+window.editFixed=id=>fixedForm(fin.fixed.find(x=>x.id===id));
+window.delFixed=function(id){ if(!confirm("¿Borrar este gasto fijo?"))return; fin.fixed=fin.fixed.filter(x=>x.id!==id); finRender(); };
+
+function loanForm(l){
+  openFin(`<h3>${l?"Editar":"Nuevo"} préstamo</h3>
+    <label>Nombre</label><input id="oName" placeholder="Ej: Préstamo auto, Tarjeta" value="${l?escapeAttr(l.name):''}" autocomplete="off">
+    <label>Monto de la cuota (₲)</label><input class="amount-input money" id="oAmt" inputmode="numeric" value="${l?nfmt(l.amount):''}" placeholder="0" autocomplete="off">
+    <label style="display:flex;align-items:center;gap:8px;margin:2px 2px 14px;font-size:14px;color:var(--text)"><input type="checkbox" id="oVar" ${l&&l.variable?"checked":""} style="width:auto;margin:0"> La cuota es variable (cambia cada mes)</label>
+    <label>Día de vencimiento (1–31)</label><input id="oDay" inputmode="numeric" value="${l?(l.dueDay||''):''}" placeholder="Ej: 15" autocomplete="off">
+    <div style="display:flex;gap:10px">
+      <div style="flex:1"><label>Cuotas totales</label><input id="oTot" inputmode="numeric" value="${l?(l.total||''):''}" placeholder="Ej: 36" autocomplete="off"></div>
+      <div style="flex:1"><label>Cuotas pagadas</label><input id="oPaid" inputmode="numeric" value="${l?(l.paid||''):''}" placeholder="Ej: 4" autocomplete="off"></div>
+    </div>
+    <label>Fecha de finalización (opcional)</label><input type="date" id="oEnd" value="${l&&l.endDate?l.endDate:''}">
+    <div class="row-btns" style="margin-top:14px"><button class="btn ghost" onclick="closeFin()">Cancelar</button><button class="btn primary" onclick="saveLoan(${l?l.id:'null'})">Guardar</button></div>`);
+  wireMoney();
+}
+window.saveLoan=function(id){
+  const name=$("oName").value.trim(), amount=parseAmt($("oAmt").value), variable=$("oVar").checked;
+  let day=Math.min(31,Math.max(1,digits($("oDay").value)||1));
+  const total=digits($("oTot").value); let paid=Math.min(total,Math.max(0,digits($("oPaid").value)));
+  const endDate=$("oEnd").value||"";
+  if(!name){ $("oName").focus(); return; }
+  if(id){ const l=fin.loans.find(x=>x.id===id); if(l) Object.assign(l,{name,amount,variable,dueDay:day,total,paid,endDate}); }
+  else fin.loans.push({id:uid(),name,amount,variable,dueDay:day,total,paid,endDate,paidMonths:{}});
+  closeFin(); finRender(); scheduleNotifs();
+};
+window.editLoan=id=>loanForm(fin.loans.find(x=>x.id===id));
+window.delLoan=function(id){ if(!confirm("¿Borrar este préstamo?"))return; fin.loans=fin.loans.filter(x=>x.id!==id); finRender(); };
+
+function varForm(v){
+  _pendingPhoto = v? (v.photo||null) : null;
+  const cats=CATS.map(c=>`<button type="button" class="cat ${v&&v.cat===c[0]?'on':''}" data-cat="${c[0]}">${c[1]} ${c[0]}</button>`).join("");
+  openFin(`<h3>${v?"Editar":"Nuevo"} gasto</h3>
+    <label>Categoría</label><div class="seg3" id="catSeg">${cats}</div>
+    <label>Monto (₲)</label><input class="amount-input money" id="vAmt" inputmode="numeric" value="${v?nfmt(v.amount):''}" placeholder="0" autocomplete="off">
+    <label>Fecha</label><input type="date" id="vDate" value="${v?v.date:todayStr()}">
+    <label>Nota (opcional)</label><input id="vNote" placeholder="Ej: nafta, almuerzo" value="${v?escapeAttr(v.note||''):''}" autocomplete="off">
+    <label>Factura (foto opcional)</label>
+    <div class="photo-pick">
+      <button type="button" class="pp-btn" id="ppBtn">📷 <span id="ppLabel">${v&&v.photo?'Cambiar foto':'Sacar / elegir foto'}</span></button>
+      <img class="pp-prev ${v&&v.photo?'show':''}" id="ppPrev" src="${v&&v.photo?v.photo:''}" alt="Vista previa">
+    </div>
+    <input type="file" id="vPhoto" accept="image/*" capture="environment" style="display:none">
+    <div class="hint">La foto queda pegada al gasto. El monto lo escribís vos.</div>
+    <div class="row-btns" style="margin-top:14px"><button class="btn ghost" onclick="closeFin()">Cancelar</button><button class="btn primary" onclick="saveVar(${v?v.id:'null'})">Guardar</button></div>`);
+  wireMoney();
+  $("catSeg").querySelectorAll(".cat").forEach(b=>b.addEventListener("click",()=>{ $("catSeg").querySelectorAll(".cat").forEach(x=>x.classList.remove("on")); b.classList.add("on"); }));
+  $("ppBtn").addEventListener("click",()=>$("vPhoto").click());
+  $("vPhoto").addEventListener("change",async e=>{
+    const file=e.target.files[0]; if(!file)return;
+    $("ppLabel").textContent="Procesando…";
+    try{ _pendingPhoto=await compressImage(file); const p=$("ppPrev"); p.src=_pendingPhoto; p.classList.add("show"); $("ppLabel").textContent="Cambiar foto"; }
+    catch(err){ $("ppLabel").textContent="No se pudo cargar la foto"; }
+  });
+}
+window.saveVar=function(id){
+  const sel=$("catSeg").querySelector(".cat.on");
+  const cat=sel? sel.getAttribute("data-cat") : "Otro";
+  const amount=parseAmt($("vAmt").value), date=$("vDate").value||todayStr(), note=$("vNote").value.trim();
+  if(amount<=0){ $("vAmt").focus(); return; }
+  if(id){ const v=fin.vars.find(x=>x.id===id); if(v) Object.assign(v,{cat,amount,date,note,photo:_pendingPhoto}); }
+  else fin.vars.push({id:uid(),cat,amount,date,note,photo:_pendingPhoto});
+  const ok=saveFin();
+  if(!ok && _pendingPhoto){ const v=id?fin.vars.find(x=>x.id===id):fin.vars[fin.vars.length-1]; if(v){ v.photo=null; saveFin(); toast("Gasto guardado sin la foto (memoria llena)"); } }
+  _pendingPhoto=null; closeFin(); finRender();
+};
+window.editVar=id=>varForm(fin.vars.find(x=>x.id===id));
+window.delVar=function(id){ if(!confirm("¿Borrar este gasto?"))return; fin.vars=fin.vars.filter(x=>x.id!==id); finRender(); };
+
+function compressImage(file, maxDim=900, quality=0.5){
+  return new Promise((res,rej)=>{
+    const img=new Image(), url=URL.createObjectURL(file);
+    img.onload=()=>{
+      let w=img.width, h=img.height;
+      if(w>h && w>maxDim){ h=Math.round(h*maxDim/w); w=maxDim; }
+      else if(h>=w && h>maxDim){ w=Math.round(w*maxDim/h); h=maxDim; }
+      const c=document.createElement("canvas"); c.width=w; c.height=h;
+      c.getContext("2d").drawImage(img,0,0,w,h);
+      URL.revokeObjectURL(url);
+      try{ res(c.toDataURL("image/jpeg",quality)); }catch(e){ rej(e); }
+    };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error("img")); };
+    img.src=url;
+  });
+}
+
+/* Insignias y notificaciones (best-effort) */
+function updateFinBadge(){
+  const unpaid=pendingBills().filter(b=>!b.paid);
+  const urgent=unpaid.filter(b=>b.st.state==="late"||b.st.state==="due").length;
+  const dot=$("tabDot");
+  if(unpaid.length>0){ dot.textContent=unpaid.length; dot.classList.add("show"); } else dot.classList.remove("show");
+  try{ if(urgent>0 && navigator.setAppBadge) navigator.setAppBadge(urgent); else if(navigator.clearAppBadge) navigator.clearAppBadge(); }catch(e){}
+}
+function notifState(){ return ("Notification" in window) ? Notification.permission : "unsupported"; }
+function paintNotifCta(){
+  const st=notifState(), btn=$("notifBtn"), txt=$("notifTxt");
+  if(st==="unsupported"){ btn.style.display="none"; txt.textContent="Este dispositivo no soporta notificaciones; verás los avisos dentro de la app."; return; }
+  if(st==="granted"){ btn.textContent="Activados ✓"; btn.classList.add("on"); txt.textContent="Te avisaremos de los vencimientos al abrir la app y, si el sistema lo permite, aunque esté cerrada."; }
+  else if(st==="denied"){ btn.textContent="Bloqueado"; btn.classList.add("on"); txt.textContent="Notificaciones bloqueadas. Habilitalas en los ajustes del sistema para esta app."; }
+  else { btn.textContent="Activar"; btn.classList.remove("on"); txt.textContent="Activá los recordatorios para que te avise antes de cada vencimiento."; }
+}
+$("notifBtn").addEventListener("click",async()=>{
+  if(!("Notification" in window))return;
+  try{ const p=await Notification.requestPermission(); paintNotifCta(); if(p==="granted"){ toast("Recordatorios activados"); scheduleNotifs(); checkDueNow(); } }catch(e){}
+});
+async function scheduleNotifs(){
+  try{
+    if(!("serviceWorker" in navigator) || notifState()!=="granted") return;
+    const reg=await navigator.serviceWorker.ready;
+    if(!("showTrigger" in Notification.prototype) || typeof TimestampTrigger==="undefined") return;
+    (await reg.getNotifications({includeTriggered:true}).catch(()=>[])).forEach(n=>{ if(n.tag && n.tag.indexOf("bill-")===0) n.close(); });
+    pendingBills().filter(b=>!b.paid && b.st.diff>=0).forEach(b=>{
+      const when=new Date(b.st.due); when.setHours(9,0,0,0);
+      if(when.getTime()<=Date.now()) return;
+      reg.showNotification("Pago próximo: "+b.name,{ body:fmt(b.amount)+" vence hoy.", tag:"bill-"+b.kind+"-"+b.id, icon:"icon-192.png", badge:"icon-192.png", showTrigger:new TimestampTrigger(when.getTime()), data:{url:"./index.html?tab=finanzas"} }).catch(()=>{});
+    });
+  }catch(e){}
+}
+function checkDueNow(){
+  if(notifState()!=="granted" || !("serviceWorker" in navigator)) return;
+  const urgent=pendingBills().filter(b=>!b.paid && (b.st.state==="late" || b.st.diff===0));
+  if(urgent.length===0) return;
+  const key="d"+todayStr(); let last={};
+  try{ last=JSON.parse(localStorage.getItem("fin_notified")||"{}"); }catch(e){}
+  if(last[key]) return;
+  navigator.serviceWorker.ready.then(reg=>{
+    const names=urgent.slice(0,4).map(b=>b.name).join(", ");
+    reg.showNotification(urgent.length+" pago(s) por vencer",{ body:names+(urgent.length>4?"…":""), icon:"icon-192.png", badge:"icon-192.png", tag:"bill-today", data:{url:"./index.html?tab=finanzas"} }).catch(()=>{});
+  }).catch(()=>{});
+  try{ localStorage.setItem("fin_notified",JSON.stringify({[key]:true})); }catch(e){}
+}
+
+/* Pestañas */
+function showTab(which){
+  const a = which==="ahorro";
+  $("viewAhorro").hidden=!a; $("viewFinanzas").hidden=a;
+  $("tabAhorro").classList.toggle("active",a); $("tabFinanzas").classList.toggle("active",!a);
+  $("fab").hidden=!a; $("fabFin").hidden=a;
+  window.scrollTo(0,0);
+  if(!a) finRender();
+  try{ localStorage.setItem("fin_tab", which); }catch(e){}
+}
+$("tabAhorro").addEventListener("click",()=>showTab("ahorro"));
+$("tabFinanzas").addEventListener("click",()=>showTab("finanzas"));
+$("fabFin").addEventListener("click",()=>varForm(null));
+$("editIncome").addEventListener("click",editIncome);
+$("addFixed").addEventListener("click",()=>fixedForm(null));
+$("addLoan").addEventListener("click",()=>loanForm(null));
+$("addVar").addEventListener("click",()=>varForm(null));
+
+/* Init finanzas */
+finRender();
+paintNotifCta();
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(p.get("tab")==="finanzas") showTab("finanzas");
+  else { try{ if(localStorage.getItem("fin_tab")==="finanzas") showTab("finanzas"); }catch(e){} }
+})();
+scheduleNotifs(); checkDueNow();
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden){ finRender(); checkDueNow(); } });
+
 /* Service worker */
 if("serviceWorker" in navigator){
   window.addEventListener("load", ()=> navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  navigator.serviceWorker.addEventListener("message", e=>{ if(e.data && e.data.type==="go-finanzas") showTab("finanzas"); });
 }
 </script>
 </body>

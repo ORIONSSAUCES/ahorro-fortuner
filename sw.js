@@ -1,4 +1,4 @@
-const CACHE = "ahorro-v3";
+const CACHE = "ahorro-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -49,6 +49,19 @@ async function renderWidget(widget) {
 
 self.addEventListener("widgetinstall", e => e.waitUntil(renderWidget(e.widget)));
 self.addEventListener("widgetresume", e => e.waitUntil(renderWidget(e.widget)));
+
+/* ---------- Notificaciones de pagos ---------- */
+self.addEventListener("notificationclick", e => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || "./index.html?tab=finanzas";
+  e.waitUntil((async () => {
+    const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    for (const c of all) {
+      if ("focus" in c) { c.postMessage({ type: "go-finanzas" }); return c.focus(); }
+    }
+    if (self.clients.openWindow) return self.clients.openWindow(url);
+  })());
+});
 
 // La app envía el progreso actual; refrescamos el widget con datos reales.
 self.addEventListener("message", e => {
