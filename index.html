@@ -199,6 +199,15 @@
   .loan-prog{margin-top:9px}
   .loan-prog .minibar{height:9px}
   .loan-prog .lp-row{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-weight:600;margin-top:6px}
+  .cuotas{margin-top:12px;border-top:1px solid var(--line);padding-top:11px;display:flex;flex-direction:column;gap:9px}
+  .cuota-row{display:flex;align-items:center;gap:8px}
+  .cuota-row .cq-info{flex:1;min-width:0}
+  .cuota-row .cq-d{font-weight:700;font-size:13px}
+  .cuota-row .cq-t{margin-top:3px}
+  .cuota-row .cq-amt{background:var(--card);border:1px solid var(--line);color:var(--text);font-weight:800;font-size:13px;padding:7px 10px;border-radius:10px;cursor:pointer;white-space:nowrap}
+  .cuota-row .cq-amt:active{border-color:var(--accent2)}
+  .cuota-foot{text-align:right;color:var(--muted);font-size:12.5px;margin-top:2px}
+  .cuota-foot b{color:var(--text)}
 
   .notif-cta{display:flex;gap:10px;align-items:center;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px}
   .notif-cta .txt{flex:1;font-size:13px;color:var(--muted)}
@@ -790,9 +799,19 @@ function normalizeFin(f){
   return {
     income: Object.assign({salary:0, quincena:0}, f.income||{}),
     fixed: Array.isArray(f.fixed)? f.fixed : [],
-    loans: Array.isArray(f.loans)? f.loans : [],
+    loans: (Array.isArray(f.loans)? f.loans : []).map(migrateLoan),
     vars:  Array.isArray(f.vars) ? f.vars  : []
   };
+}
+/* Préstamos viejos (total/paid) → nuevo modelo con calendario de cuotas */
+function migrateLoan(l){
+  l = l || {};
+  if(Array.isArray(l.cuotas)){ l.paidPrev = l.paidPrev||0; return l; }
+  const total = l.total||0, paid = Math.min(l.paid||0, total), left = Math.max(0, total-paid);
+  l.paidPrev = paid;
+  l.cuotas = buildSchedule(left, l.dueDay||1, l.amount||0);
+  l.endDate = l.cuotas.length ? l.cuotas[l.cuotas.length-1].due : (l.endDate||"");
+  return l;
 }
 let fin = normalizeFin(load(K_FIN, {}));
 let _pendingPhoto = null;
@@ -807,6 +826,8 @@ function uid(){ return Date.now() + Math.floor(Math.random()*1000); }
 function nfmt(n){ return Math.round(n||0).toLocaleString("es-PY").replace(/,/g,"."); }
 function escapeAttr(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
 function fmtDate(s){ return new Date(s+"T00:00:00").toLocaleDateString("es-PY",{day:"2-digit",month:"short",year:"numeric"}); }
+function fmtD(d){ return d.toLocaleDateString("es-PY",{day:"2-digit",month:"short",year:"numeric"}); }
+function daysTxt(diff){ return diff<0 ? "Vencido "+(-diff)+"d" : diff===0 ? "Vence hoy" : "Faltan "+diff+" días"; }
 function ymOf(d){ d=d||new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); }
 function curYM(){ return ymOf(new Date()); }
 function catIcon(c){ const f=CATS.find(x=>x[0]===c); return f? f[1] : "🏷️"; }
@@ -814,28 +835,43 @@ function catIcon(c){ const f=CATS.find(x=>x[0]===c); return f? f[1] : "🏷️";
 /* Cálculos */
 function incomeTotal(){ return (fin.income.salary||0) + (fin.income.quincena||0); }
 function fixedTotal(){ return fin.fixed.reduce((s,f)=> s+(f.amount||0), 0); }
-function loansMonthlyTotal(){ return fin.loans.filter(l=>(l.paid||0)<(l.total||0)).reduce((s,l)=> s+(l.amount||0), 0); }
+function loansMonthlyTotal(){ return fin.loans.reduce((s,l)=> s+loanMonthAmount(l), 0); }
 function varsThisMonth(){ const m=curYM(); return fin.vars.filter(v=> ymOf(new Date(v.date+"T00:00:00"))===m); }
+
+/* ---------- Cuotas de préstamos ---------- */
+function clampDay(y,mo,day){ const dim=new Date(y,mo+1,0).getDate(); return Math.min(Math.max(1,day||1), dim); }
+function ymdOf(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function buildSchedule(count, dueDay, amount){
+  const arr=[]; const t=new Date(); t.setHours(0,0,0,0);
+  let y=t.getFullYear(), mo=t.getMonth();
+  const firstDay=clampDay(y,mo,dueDay);
+  if(t.getDate()>firstDay) mo++;                 // si ya pasó el día este mes, arranca el mes siguiente
+  for(let i=0;i<count;i++){
+    const yy=y+Math.floor((mo+i)/12), m2=((mo+i)%12+12)%12;
+    arr.push({ due: yy+"-"+String(m2+1).padStart(2,"0")+"-"+String(clampDay(yy,m2,dueDay)).padStart(2,"0"), amount:amount||0, paid:false });
+  }
+  return arr;
+}
+function nextMonthDate(date, day){ const y=date.getFullYear(), m=date.getMonth()+1; return new Date(y, m, clampDay(y, m, day)); }
+function loanTotal(l){ return (l.paidPrev||0) + (l.cuotas? l.cuotas.length : 0); }
+function loanPaid(l){ return (l.paidPrev||0) + (l.cuotas? l.cuotas.filter(c=>c.paid).length : 0); }
+function loanLeft(l){ return l.cuotas? l.cuotas.filter(c=>!c.paid).length : 0; }
+function loanNextDue(l){ return (l.cuotas||[]).filter(c=>!c.paid).sort((a,b)=>a.due.localeCompare(b.due))[0] || null; }
+function loanMonthAmount(l){ const m=curYM(); return (l.cuotas||[]).filter(c=>c.due.slice(0,7)===m).reduce((s,c)=>s+(c.amount||0), 0); }
 function varsTotal(){ return varsThisMonth().reduce((s,v)=> s+(v.amount||0), 0); }
 
-function billStatus(dueDay, paid){
+function statusFor(dueDate, paid){
   const today=new Date(); today.setHours(0,0,0,0);
-  const y=today.getFullYear(), mo=today.getMonth();
-  const dim=new Date(y,mo+1,0).getDate();
-  const day=Math.min(Math.max(1,dueDay||1), dim);
-  const due=new Date(y,mo,day);
-  const diff=Math.round((due-today)/86400000);
-  let state;
-  if(paid) state="ok";
-  else if(diff<0) state="late";
-  else if(diff<=5) state="due";
-  else state="upcoming";
-  return {state, diff, due};
+  const d=new Date(dueDate); d.setHours(0,0,0,0);
+  const diff=Math.round((d-today)/86400000);
+  let state = paid ? "ok" : diff<0 ? "late" : diff<=5 ? "due" : "upcoming";
+  return {state, diff, due:d};
 }
+function dueDateThisMonth(dueDay){ const t=new Date(); const y=t.getFullYear(), mo=t.getMonth(); return new Date(y, mo, clampDay(y, mo, dueDay)); }
 function pendingBills(){
   const m=curYM(); const list=[];
-  fin.fixed.forEach(f=>{ const paid=!!(f.paid&&f.paid[m]); list.push({kind:"fixed",id:f.id,name:f.name,amount:f.amount,dueDay:f.dueDay,paid,st:billStatus(f.dueDay,paid)}); });
-  fin.loans.forEach(l=>{ if((l.paid||0)>=(l.total||0)) return; const paid=!!(l.paidMonths&&l.paidMonths[m]); list.push({kind:"loan",id:l.id,name:l.name,amount:l.amount,dueDay:l.dueDay,paid,st:billStatus(l.dueDay,paid)}); });
+  fin.fixed.forEach(f=>{ const paid=!!(f.paid&&f.paid[m]); const due=dueDateThisMonth(f.dueDay); list.push({kind:"fixed",id:f.id,name:f.name,amount:f.amount,due,paid,st:statusFor(due,paid)}); });
+  fin.loans.forEach(l=>{ const nx=loanNextDue(l); if(!nx) return; const due=new Date(nx.due+"T00:00:00"); list.push({kind:"loan",id:l.id,name:l.name,amount:nx.amount,due,paid:false,st:statusFor(due,false)}); });
   return list;
 }
 
@@ -871,26 +907,31 @@ function renderBills(){
   el.innerHTML=bills.map(b=>{
     let cls, txt;
     if(b.paid){ cls="ok"; txt="Pagado ✓"; }
-    else if(b.st.state==="late"){ cls="late"; txt="Vencido "+(-b.st.diff)+"d"; }
+    else if(b.st.diff<0){ cls="late"; txt="Vencido "+(-b.st.diff)+"d"; }
     else if(b.st.diff===0){ cls="due"; txt="Vence hoy"; }
-    else if(b.st.state==="due"){ cls="due"; txt="En "+b.st.diff+"d"; }
-    else { cls="ok"; txt="Día "+(b.dueDay||"—"); }
-    if(b.st.state==="upcoming" && !b.paid) cls="";
+    else if(b.st.diff<=5){ cls="due"; txt="Faltan "+b.st.diff+"d"; }
+    else { cls=""; txt="Faltan "+b.st.diff+"d"; }
     const pill=`<span class="pill ${cls}" ${cls===""?'style="background:var(--card);color:var(--muted)"':''}>${txt}</span>`;
+    const action=b.kind==="fixed" ? `togglePaid('fixed',${b.id})` : `payLoanNext(${b.id})`;
     return `<div class="item">
       <div class="ic">${b.kind==="loan"?"🏦":"📌"}</div>
-      <div class="info"><div class="t1">${escapeHtml(b.name)}</div><div class="t2">${fmt(b.amount)}${b.kind==="loan"?" · cuota":""}</div></div>
+      <div class="info"><div class="t1">${escapeHtml(b.name)}${b.kind==="loan"?' <span style="color:var(--muted);font-size:12px">cuota</span>':''}</div><div class="t2">${fmt(b.amount)} · ${fmtD(b.due)}</div></div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
         ${pill}
-        <button class="pay-btn ${b.paid?'done':''}" onclick="togglePaid('${b.kind}',${b.id})">${b.paid?'✓ Pagado':'Marcar pagado'}</button>
+        <button class="pay-btn ${b.paid?'done':''}" onclick="${action}">${b.paid?'✓ Pagado':'Marcar pagado'}</button>
       </div>
     </div>`;
   }).join("");
 }
 window.togglePaid=function(kind,id){
   const m=curYM();
-  if(kind==="fixed"){ const f=fin.fixed.find(x=>x.id===id); if(!f)return; f.paid=f.paid||{}; f.paid[m]=!f.paid[m]; }
-  else { const l=fin.loans.find(x=>x.id===id); if(!l)return; l.paidMonths=l.paidMonths||{}; const now=!l.paidMonths[m]; l.paidMonths[m]=now; l.paid = now? Math.min(l.total||0,(l.paid||0)+1) : Math.max(0,(l.paid||0)-1); }
+  const f=fin.fixed.find(x=>x.id===id); if(!f)return; f.paid=f.paid||{}; f.paid[m]=!f.paid[m];
+  finRender(); scheduleNotifs();
+};
+window.payLoanNext=function(id){
+  const l=fin.loans.find(x=>x.id===id); if(!l)return;
+  const nx=(l.cuotas||[]).filter(c=>!c.paid).sort((a,b)=>a.due.localeCompare(b.due))[0];
+  if(nx){ nx.paid=true; toast("Cuota marcada como pagada"); }
   finRender(); scheduleNotifs();
 };
 
@@ -908,26 +949,58 @@ function renderFixed(){
   }).join("");
 }
 
+const expandedLoans = new Set();
 function renderLoans(){
   const el=$("loansBody");
-  if(fin.loans.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Sin préstamos. Agregá uno para seguir cuotas pagadas y las que faltan.</div>'; return; }
+  if(fin.loans.length===0){ el.innerHTML='<div class="empty" style="padding:14px">Sin préstamos. Agregá uno: cargá las cuotas que te faltan y sus vencimientos.</div>'; return; }
   el.innerHTML=fin.loans.map(l=>{
-    const total=l.total||0, paid=Math.min(l.paid||0,total), left=Math.max(0,total-paid);
-    const p=total>0? Math.round(paid/total*100):0, done=total>0 && paid>=total;
+    const total=loanTotal(l), paid=loanPaid(l), left=loanLeft(l);
+    const p=total>0? Math.round(paid/total*100):0, done=left===0;
+    const nx=loanNextDue(l);
+    let nextTxt = done ? "Préstamo terminado ✅"
+      : nx ? daysTxt(statusFor(new Date(nx.due+"T00:00:00"),false).diff)+" · "+fmtDate(nx.due)
+      : "Sin cuotas pendientes";
+    const open=expandedLoans.has(l.id);
     return `<div class="item" style="flex-direction:column;align-items:stretch;gap:0">
-      <div style="display:flex;align-items:center;gap:11px">
+      <div style="display:flex;align-items:center;gap:11px;cursor:pointer" onclick="toggleLoan(${l.id})">
         <div class="ic">🏦</div>
-        <div class="info"><div class="t1">${escapeHtml(l.name)}</div>
-          <div class="t2">${l.variable?"Cuota variable":fmt(l.amount)}${l.endDate?" · fin "+fmtDate(l.endDate):""}</div></div>
-        <div class="acts"><button onclick="editLoan(${l.id})" aria-label="Editar">✏️</button><button onclick="delLoan(${l.id})" aria-label="Borrar">🗑️</button></div>
+        <div class="info"><div class="t1">${escapeHtml(l.name)} <span style="color:var(--muted);font-size:12px">${open?'▲':'▼'}</span></div>
+          <div class="t2">${l.variable?"Cuota variable":fmt(l.amount)} · ${nextTxt}</div></div>
+        <div class="acts" onclick="event.stopPropagation()"><button onclick="editLoan(${l.id})" aria-label="Editar">✏️</button><button onclick="delLoan(${l.id})" aria-label="Borrar">🗑️</button></div>
       </div>
       <div class="loan-prog">
         <div class="minibar"><i style="width:${p}%"></i></div>
         <div class="lp-row"><span>Cuota ${paid}/${total} · faltan ${left}</span><span>${done?"✅ Terminado":p+"%"}</span></div>
       </div>
+      ${open?`<div class="cuotas">${renderCuotas(l)}</div>`:""}
     </div>`;
   }).join("");
 }
+function renderCuotas(l){
+  if(!l.cuotas || l.cuotas.length===0) return '<div class="empty" style="padding:10px">Sin cuotas pendientes.</div>';
+  const rows=l.cuotas.map((c,i)=>{
+    const st=statusFor(new Date(c.due+"T00:00:00"), c.paid);
+    let tag = c.paid ? '<span class="pill ok">Pagada ✓</span>'
+      : st.diff<0 ? `<span class="pill late">Vencida ${-st.diff}d</span>`
+      : st.diff===0 ? '<span class="pill due">Hoy</span>'
+      : `<span class="pill" style="background:var(--card);color:var(--muted)">Faltan ${st.diff}d</span>`;
+    return `<div class="cuota-row">
+      <div class="cq-info"><div class="cq-d">${i+1}. ${fmtDate(c.due)}</div><div class="cq-t">${tag}</div></div>
+      <button class="cq-amt" onclick="editCuota(${l.id},${i})">${fmt(c.amount)} ✏️</button>
+      <button class="pay-btn ${c.paid?'done':''}" onclick="toggleCuota(${l.id},${i})">${c.paid?'✓':'Pagar'}</button>
+    </div>`;
+  }).join("");
+  const pend=l.cuotas.filter(c=>!c.paid).reduce((s,c)=>s+(c.amount||0),0);
+  return rows + `<div class="cuota-foot">Falta pagar en total: <b>${fmt(pend)}</b></div>`;
+}
+window.toggleLoan=function(id){ if(expandedLoans.has(id)) expandedLoans.delete(id); else expandedLoans.add(id); renderLoans(); };
+window.toggleCuota=function(id,i){ const l=fin.loans.find(x=>x.id===id); if(!l||!l.cuotas[i])return; l.cuotas[i].paid=!l.cuotas[i].paid; finRender(); scheduleNotifs(); };
+window.editCuota=function(id,i){
+  const l=fin.loans.find(x=>x.id===id); if(!l||!l.cuotas[i])return;
+  const cur=l.cuotas[i].amount||0;
+  const v=prompt("Monto de esta cuota (₲):", cur? nfmt(cur):"");
+  if(v===null)return; l.cuotas[i].amount=parseAmt(v); finRender();
+};
 
 function renderVars(){
   const el=$("varsBody");
@@ -993,27 +1066,46 @@ window.editFixed=id=>fixedForm(fin.fixed.find(x=>x.id===id));
 window.delFixed=function(id){ if(!confirm("¿Borrar este gasto fijo?"))return; fin.fixed=fin.fixed.filter(x=>x.id!==id); finRender(); };
 
 function loanForm(l){
+  const left = l ? loanLeft(l) : "";
+  const prev = l ? (l.paidPrev||0) : "";
   openFin(`<h3>${l?"Editar":"Nuevo"} préstamo</h3>
     <label>Nombre</label><input id="oName" placeholder="Ej: Préstamo auto, Tarjeta" value="${l?escapeAttr(l.name):''}" autocomplete="off">
     <label>Monto de la cuota (₲)</label><input class="amount-input money" id="oAmt" inputmode="numeric" value="${l?nfmt(l.amount):''}" placeholder="0" autocomplete="off">
-    <label style="display:flex;align-items:center;gap:8px;margin:2px 2px 14px;font-size:14px;color:var(--text)"><input type="checkbox" id="oVar" ${l&&l.variable?"checked":""} style="width:auto;margin:0"> La cuota es variable (cambia cada mes)</label>
+    <label style="display:flex;align-items:center;gap:8px;margin:2px 2px 14px;font-size:14px;color:var(--text)"><input type="checkbox" id="oVar" ${l&&l.variable?"checked":""} style="width:auto;margin:0"> La cuota es variable (ajustás cada una)</label>
     <label>Día de vencimiento (1–31)</label><input id="oDay" inputmode="numeric" value="${l?(l.dueDay||''):''}" placeholder="Ej: 15" autocomplete="off">
     <div style="display:flex;gap:10px">
-      <div style="flex:1"><label>Cuotas totales</label><input id="oTot" inputmode="numeric" value="${l?(l.total||''):''}" placeholder="Ej: 36" autocomplete="off"></div>
-      <div style="flex:1"><label>Cuotas pagadas</label><input id="oPaid" inputmode="numeric" value="${l?(l.paid||''):''}" placeholder="Ej: 4" autocomplete="off"></div>
+      <div style="flex:1"><label>Cuotas que faltan</label><input id="oLeft" inputmode="numeric" value="${left}" placeholder="Ej: 32" autocomplete="off"></div>
+      <div style="flex:1"><label>Cuotas ya pagadas</label><input id="oPrev" inputmode="numeric" value="${prev}" placeholder="Ej: 4" autocomplete="off"></div>
     </div>
-    <label>Fecha de finalización (opcional)</label><input type="date" id="oEnd" value="${l&&l.endDate?l.endDate:''}">
+    <div class="hint" id="oEndHint">Genera un calendario mensual de cuotas desde el día de vencimiento.</div>
     <div class="row-btns" style="margin-top:14px"><button class="btn ghost" onclick="closeFin()">Cancelar</button><button class="btn primary" onclick="saveLoan(${l?l.id:'null'})">Guardar</button></div>`);
   wireMoney();
+  const upd=()=>{ const n=digits($("oLeft").value), d=Math.min(31,Math.max(1,digits($("oDay").value)||1)); const h=$("oEndHint");
+    if(n>0){ const s=buildSchedule(n,d,0); h.textContent="Última cuota: "+fmtDate(s[s.length-1].due)+" ("+n+" meses)."; }
+    else h.textContent="Genera un calendario mensual de cuotas desde el día de vencimiento."; };
+  $("oLeft").addEventListener("input",upd); $("oDay").addEventListener("input",upd); upd();
+}
+function reconcileSchedule(l, desiredLeft, day, amount){
+  l.cuotas = l.cuotas || [];
+  // actualizar día (y monto si es fija) en cuotas no pagadas
+  l.cuotas.forEach(c=>{ if(!c.paid){ const [y,mo]=c.due.split("-"); c.due=y+"-"+mo+"-"+String(clampDay(+y,+mo-1,day)).padStart(2,"0"); if(!l.variable) c.amount=amount; } });
+  let unpaid=l.cuotas.filter(c=>!c.paid).length;
+  if(desiredLeft>unpaid){
+    let base = l.cuotas.length ? new Date(l.cuotas[l.cuotas.length-1].due+"T00:00:00") : new Date();
+    for(let i=0;i<desiredLeft-unpaid;i++){ base=nextMonthDate(base, day); l.cuotas.push({due:ymdOf(base), amount:amount||0, paid:false}); }
+  } else if(desiredLeft<unpaid){
+    let rm=unpaid-desiredLeft;
+    for(let i=l.cuotas.length-1;i>=0 && rm>0;i--){ if(!l.cuotas[i].paid){ l.cuotas.splice(i,1); rm--; } }
+  }
+  l.endDate = l.cuotas.length ? l.cuotas[l.cuotas.length-1].due : "";
 }
 window.saveLoan=function(id){
   const name=$("oName").value.trim(), amount=parseAmt($("oAmt").value), variable=$("oVar").checked;
   let day=Math.min(31,Math.max(1,digits($("oDay").value)||1));
-  const total=digits($("oTot").value); let paid=Math.min(total,Math.max(0,digits($("oPaid").value)));
-  const endDate=$("oEnd").value||"";
+  const leftN=digits($("oLeft").value), prevN=digits($("oPrev").value);
   if(!name){ $("oName").focus(); return; }
-  if(id){ const l=fin.loans.find(x=>x.id===id); if(l) Object.assign(l,{name,amount,variable,dueDay:day,total,paid,endDate}); }
-  else fin.loans.push({id:uid(),name,amount,variable,dueDay:day,total,paid,endDate,paidMonths:{}});
+  if(id){ const l=fin.loans.find(x=>x.id===id); if(l){ l.name=name; l.amount=amount; l.variable=variable; l.dueDay=day; l.paidPrev=prevN; reconcileSchedule(l, leftN, day, amount); } }
+  else { const l={id:uid(),name,amount,variable,dueDay:day,paidPrev:prevN,cuotas:buildSchedule(leftN,day,amount)}; l.endDate=l.cuotas.length?l.cuotas[l.cuotas.length-1].due:""; fin.loans.push(l); }
   closeFin(); finRender(); scheduleNotifs();
 };
 window.editLoan=id=>loanForm(fin.loans.find(x=>x.id===id));
@@ -1146,11 +1238,11 @@ function compressImage(file, maxDim=900, quality=0.5){
 
 /* Insignias y notificaciones (best-effort) */
 function updateFinBadge(){
-  const unpaid=pendingBills().filter(b=>!b.paid);
-  const urgent=unpaid.filter(b=>b.st.state==="late"||b.st.state==="due").length;
+  const soon=pendingBills().filter(b=>!b.paid && b.st.diff<=7);   // vencidas o dentro de 7 días
   const dot=$("tabDot");
-  if(unpaid.length>0){ dot.textContent=unpaid.length; dot.classList.add("show"); } else dot.classList.remove("show");
-  try{ if(urgent>0 && navigator.setAppBadge) navigator.setAppBadge(urgent); else if(navigator.clearAppBadge) navigator.clearAppBadge(); }catch(e){}
+  if(soon.length>0){ dot.textContent=soon.length; dot.classList.add("show"); } else dot.classList.remove("show");
+  const urgent=soon.filter(b=>b.st.diff<=2).length;
+  try{ if(navigator.setAppBadge){ if(urgent>0) navigator.setAppBadge(urgent); else if(navigator.clearAppBadge) navigator.clearAppBadge(); } }catch(e){}
 }
 function notifState(){ return ("Notification" in window) ? Notification.permission : "unsupported"; }
 function paintNotifCta(){
