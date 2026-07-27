@@ -1,4 +1,4 @@
-const CACHE = "ahorro-v4";
+const CACHE = "ahorro-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -23,6 +23,22 @@ self.addEventListener("activate", e => {
 
 self.addEventListener("fetch", e => {
   if (e.request.method !== "GET") return;
+  const url = new URL(e.request.url);
+  const isDoc = e.request.mode === "navigate" || url.pathname.endsWith("/") || url.pathname.endsWith("index.html");
+
+  // HTML: red primero (siempre la última versión si hay conexión), con respaldo offline
+  if (isDoc) {
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy));
+        return res;
+      }).catch(() => caches.match(e.request).then(r => r || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // Resto de assets: caché primero, con actualización en segundo plano
   e.respondWith(
     caches.match(e.request).then(cached => {
       const network = fetch(e.request).then(res => {
