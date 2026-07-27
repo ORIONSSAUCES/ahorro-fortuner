@@ -205,9 +205,19 @@
   .notif-cta button{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#04180c;border:none;font-weight:800;font-size:13px;padding:10px 14px;border-radius:10px;cursor:pointer;white-space:nowrap}
   .notif-cta button.on{background:var(--card);color:var(--accent);border:1px solid #2a4a2f}
 
+  #varCats{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+  #varCats:empty{display:none}
+  .vcat{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 11px;font-size:13px;font-weight:600}
+  .vcat b{font-weight:800}
   .add-row{width:100%;background:var(--card2);border:1px dashed var(--line);color:var(--muted);font-weight:700;
-    font-size:14px;padding:13px;border-radius:12px;cursor:pointer;margin-top:2px}
+    font-size:14px;padding:13px;border-radius:12px;cursor:pointer;margin-top:2px;margin-bottom:8px}
   .add-row:active{border-color:var(--accent)}
+  .scan-row{border-style:solid;border-color:#5b3a8e;color:#c084fc;background:rgba(168,85,247,.1)}
+  .scan-wrap{text-align:center}
+  .scan-prev{max-width:100%;max-height:230px;border-radius:12px;border:1px solid var(--line);margin-bottom:14px}
+  .scan-bar{height:12px;background:#0c1424;border-radius:999px;overflow:hidden;border:1px solid var(--line);margin:8px 0}
+  .scan-bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#a855f7,#ec4899);transition:width .3s}
+  .scan-note{color:var(--muted);font-size:13px;margin-top:8px}
 
   .photo-pick{display:flex;gap:10px;align-items:center;margin-bottom:14px}
   .photo-pick .pp-btn{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--text);border-radius:12px;
@@ -357,8 +367,11 @@
       <h2>🧾 Gastos variables del mes</h2>
       <span class="pct-big" id="varHeadTot" style="font-size:16px">₲ 0</span>
     </div>
+    <div id="varCats"></div>
     <div id="varsBody"></div>
-    <button class="add-row" id="addVar">＋ Agregar gasto (combustible, comida…)</button>
+    <button class="add-row scan-row" id="scanVar">📸 Escanear factura (leer monto solo)</button>
+    <button class="add-row" id="addVar">＋ Agregar gasto a mano</button>
+    <input type="file" id="scanPhoto" accept="image/*" capture="environment" style="display:none">
   </section>
 </div><!-- /viewFinanzas -->
 
@@ -400,6 +413,9 @@
 
 <!-- Visor de foto -->
 <div class="lightbox" id="lightbox"><img id="lightboxImg" alt="Factura"></div>
+
+<!-- Motor OCR (lectura de facturas). Requiere internet la primera vez. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js"></script>
 
 <script>
 const DEFAULT_GOAL = 230000000;
@@ -835,7 +851,7 @@ function finRender(){
   if(inc<=0) $("finLeftSub").textContent="Cargá tus ingresos para empezar.";
   else if(left<0) $("finLeftSub").textContent="Estás "+fmt(-left)+" por encima de tus ingresos.";
   else $("finLeftSub").textContent="Después de fijos, cuotas y variables ya cargados.";
-  renderIncome(); renderBills(); renderFixed(); renderLoans(); renderVars();
+  renderIncome(); renderBills(); renderFixed(); renderLoans(); renderVarCats(); renderVars();
   saveFin(); updateFinBadge();
 }
 
@@ -926,6 +942,13 @@ function renderVars(){
       <div class="acts"><button onclick="editVar(${v.id})" aria-label="Editar">✏️</button><button onclick="delVar(${v.id})" aria-label="Borrar">🗑️</button></div>
     </div>`;
   }).join("");
+}
+function renderVarCats(){
+  const el=$("varCats"), list=varsThisMonth();
+  if(list.length===0){ el.innerHTML=""; return; }
+  const tot={}; list.forEach(v=>{ const c=v.cat||"Otro"; tot[c]=(tot[c]||0)+(v.amount||0); });
+  el.innerHTML=Object.entries(tot).sort((a,b)=>b[1]-a[1])
+    .map(([c,t])=>`<div class="vcat"><span>${catIcon(c)} ${escapeHtml(c)}</span><b>${fmt(t)}</b></div>`).join("");
 }
 window.viewPhoto=function(id){ const v=fin.vars.find(x=>x.id===id); if(!v||!v.photo)return; $("lightboxImg").src=v.photo; $("lightbox").classList.add("open"); };
 $("lightbox").addEventListener("click",()=>$("lightbox").classList.remove("open"));
@@ -1036,6 +1059,74 @@ window.saveVar=function(id){
 window.editVar=id=>varForm(fin.vars.find(x=>x.id===id));
 window.delVar=function(id){ if(!confirm("¿Borrar este gasto?"))return; fin.vars=fin.vars.filter(x=>x.id!==id); finRender(); };
 
+/* ---------- OCR: escanear factura ---------- */
+function guessAmount(text){
+  const lines=(text||"").split(/\n/);
+  function nums(s){
+    const re=/\d{1,3}(?:[.\s]\d{3})+|\d{4,8}/g;   // 1.234.567 · 12 345 · o número plano de 4-8 dígitos
+    const out=[]; let m;
+    while((m=re.exec(s))){ const n=parseInt(m[0].replace(/\D/g,""),10); if(n>=1000 && n<=200000000) out.push(n); }
+    return out;
+  }
+  let best=0;
+  // 1) líneas que mencionan total/importe/a pagar (evitando subtotal)
+  lines.filter(l=>/(^|\W)(total|importe|a\s*pagar|monto)/i.test(l) && !/sub\s*-?\s*total/i.test(l))
+       .forEach(l=> nums(l).forEach(n=>{ if(n>best) best=n; }));
+  if(best>0) return best;
+  // 2) fallback: mayor número plausible del ticket
+  nums((text||"").replace(/\n/g," ")).forEach(n=>{ if(n>best) best=n; });
+  return best;
+}
+function guessCat(t){
+  t=(t||"").toLowerCase();
+  if(/combustible|nafta|gasoil|gas\s*oil|di[eé]sel|surtidor|estaci[oó]n\s*de\s*servicio|petropar|copetrol|\bpuma\b|shell|enex|barcos/.test(t)) return "Combustible";
+  if(/farmacia|medicament|salud|punto\s*farma|catedral/.test(t)) return "Salud";
+  if(/supermercado|super\s|despensa|market|almac[eé]n|superseis|biggie|stock|areté|arete|salemma|real|españa/.test(t)) return "Súper";
+  if(/restaurant|comida|lomiter|hamburg|pizza|burger|resto|bar\b|parrilla|heladeria|helader[ií]a/.test(t)) return "Comida";
+  if(/\bande\b|essap|copaco|tigo|personal|claro|internet|electricidad|factura\s*de\s*servicio/.test(t)) return "Servicios";
+  return "Otro";
+}
+async function scanReceipt(file){
+  openFin(`<h3>Leyendo factura…</h3>
+    <div class="scan-wrap">
+      <img class="scan-prev" id="scanPrev" alt="Factura">
+      <div class="scan-bar"><i id="scanFill"></i></div>
+      <div class="scan-note" id="scanNote">Procesando imagen…</div>
+    </div>
+    <div class="row-btns" style="margin-top:16px"><button class="btn ghost" onclick="closeFin()">Cancelar</button></div>`);
+  let hi=null;
+  try{ hi=await compressImage(file,1500,0.72); const p=$("scanPrev"); if(p) p.src=hi; }catch(e){}
+  async function stored(){ try{ return await compressImage(file,900,0.5); }catch(e){ return hi; } }
+  if(typeof Tesseract==="undefined"){
+    const n=$("scanNote"); if(n) n.textContent="Sin conexión para leer el monto. Cargalo a mano.";
+    const s=await stored(); setTimeout(()=>openVarPrefilled({amount:0,cat:"Otro",photo:s}),800);
+    return;
+  }
+  try{
+    const {data}=await Tesseract.recognize(hi||file,"spa",{ logger:m=>{
+      if(m.status==="recognizing text"){ const p=Math.round(m.progress*100); const f=$("scanFill"); if(f) f.style.width=p+"%"; const n=$("scanNote"); if(n) n.textContent="Leyendo texto… "+p+"%"; }
+      else { const n=$("scanNote"); if(n) n.textContent="Preparando el lector…"; }
+    }});
+    const amount=guessAmount(data.text), cat=guessCat(data.text);
+    const s=await stored();
+    openVarPrefilled({amount,cat,photo:s});
+    toast(amount>0? "Monto leído: revisá y guardá" : "No pude leer el monto, escribilo");
+  }catch(e){
+    const s=await stored();
+    openVarPrefilled({amount:0,cat:"Otro",photo:s});
+    toast("No se pudo leer; cargá el monto a mano");
+  }
+}
+function openVarPrefilled(p){
+  varForm(null);
+  _pendingPhoto=p.photo||null;
+  if(p.photo){ const pv=$("ppPrev"); if(pv){ pv.src=p.photo; pv.classList.add("show"); } const lb=$("ppLabel"); if(lb) lb.textContent="Cambiar foto"; }
+  if(p.amount>0){ const a=$("vAmt"); if(a) a.value=nfmt(p.amount); }
+  const seg=$("catSeg");
+  if(seg){ seg.querySelectorAll(".cat").forEach(x=>x.classList.remove("on")); const t=seg.querySelector('[data-cat="'+(p.cat||"Otro")+'"]'); if(t) t.classList.add("on"); }
+  const h=$("finSheet").querySelector("h3"); if(h) h.textContent="Revisá el gasto escaneado";
+}
+
 function compressImage(file, maxDim=900, quality=0.5){
   return new Promise((res,rej)=>{
     const img=new Image(), url=URL.createObjectURL(file);
@@ -1117,6 +1208,8 @@ $("editIncome").addEventListener("click",editIncome);
 $("addFixed").addEventListener("click",()=>fixedForm(null));
 $("addLoan").addEventListener("click",()=>loanForm(null));
 $("addVar").addEventListener("click",()=>varForm(null));
+$("scanVar").addEventListener("click",()=>$("scanPhoto").click());
+$("scanPhoto").addEventListener("change",e=>{ const f=e.target.files[0]; e.target.value=""; if(f) scanReceipt(f); });
 
 /* Init finanzas */
 finRender();
