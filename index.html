@@ -1029,9 +1029,19 @@ function statusFor(dueDate, paid){
   return {state, diff, due:d};
 }
 function dueDateThisMonth(dueDay){ const t=new Date(); const y=t.getFullYear(), mo=t.getMonth(); return new Date(y, mo, clampDay(y, mo, dueDay)); }
+/* Próxima fecha de un gasto fijo: si ya pagué este mes, o el día ya pasó, apunta al mes que viene */
+function fixedDueInfo(f){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const y=today.getFullYear(), mo=today.getMonth();
+  const paid=!!(f.paid&&f.paid[curYM()]);
+  const thisDue=new Date(y, mo, clampDay(y, mo, f.dueDay));
+  if(!paid && thisDue>=today) return {due:thisDue, paid:false};
+  const nextDue=new Date(y, mo+1, clampDay(y, mo+1, f.dueDay));
+  return {due:nextDue, paid};
+}
 function pendingBills(){
   const m=curYM(); const list=[];
-  fin.fixed.forEach(f=>{ const paid=!!(f.paid&&f.paid[m]); const due=dueDateThisMonth(f.dueDay); list.push({kind:"fixed",id:f.id,name:f.name,amount:f.amount,due,paid,st:statusFor(due,paid)}); });
+  fin.fixed.forEach(f=>{ const info=fixedDueInfo(f); list.push({kind:"fixed",id:f.id,name:f.name,amount:f.amount,due:info.due,paid:info.paid,st:statusFor(info.due,info.paid)}); });
   fin.loans.forEach(l=>{ const nx=loanNextDue(l); if(!nx) return; const due=new Date(nx.due+"T00:00:00"); list.push({kind:"loan",id:l.id,name:l.name,amount:nx.amount,due,paid:false,st:statusFor(due,false)}); });
   return list;
 }
